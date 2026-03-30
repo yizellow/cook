@@ -37,5 +37,5 @@ const currentView = computed(() => {
 </template>
 
 <style lang="scss">
-@import "./assets/style.scss";
+@use "./assets/style.scss";
 </style>
