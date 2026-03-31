@@ -58,7 +58,13 @@ const goOrders = () => {
 
     <!-- Radial Interface Component -->
     <div class="radial-container">
-      <RadialInterface :segmentCounts="[4, 6, 8]" :size="250" />
+      <RadialInterface
+        :segmentCounts="[2, 6, 3]"
+        :size="250"
+        :midiEnabled="true"
+        :midiChannels="[0, 0, 0]"
+        :midiControlNumbers="[70, 71, 72]"
+      />
     </div>
   </section>
 </template>

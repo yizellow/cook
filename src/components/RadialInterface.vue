@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 
 const props = defineProps({
   segmentCounts: {
@@ -9,6 +9,18 @@ const props = defineProps({
   size: {
     type: Number,
     default: 300,
+  },
+  midiEnabled: {
+    type: Boolean,
+    default: false,
+  },
+  midiChannels: {
+    type: Array,
+    default: () => [0, 1, 2], // MIDI channels for [inner, middle, outer] circles
+  },
+  midiControlNumbers: {
+    type: Array,
+    default: () => [10, 11, 12], // MIDI CC numbers for [inner, middle, outer] circles
   },
 });
 
@@ -59,6 +71,81 @@ const wrapAngle = (angle) => {
   const wrapped = angle % (Math.PI * 2);
   return wrapped < 0 ? wrapped + Math.PI * 2 : wrapped;
 };
+
+const mapMidiToAngle = (midiValue) => {
+  // Map MIDI value (0-127) to angle (0 to 2π)
+  return (midiValue / 127) * Math.PI * 2;
+};
+
+const handleMidiMessage = (event) => {
+  // console.log(event.data);
+  const [status, data1, data2] = event.data;
+
+  // Check if it's a control change message
+  if ((status & 0xf0) === 0xb0) {
+    const channel = status & 0x0f;
+    const controlNumber = data1;
+    const midiValue = data2;
+    // Find which circle this MIDI message corresponds to
+    for (let circleIndex = 0; circleIndex < 3; circleIndex++) {
+      if (
+        props.midiChannels[circleIndex] === channel &&
+        props.midiControlNumbers[circleIndex] === controlNumber
+      ) {
+        // Map MIDI value to angle and update
+        const newAngle = mapMidiToAngle(midiValue);
+        selectionAngles.value[circleIndex] = newAngle;
+
+        // Update the selected segment
+        const segmentCount = props.segmentCounts[circleIndex] || 8;
+        const segment =
+          Math.floor((newAngle / (Math.PI * 2)) * segmentCount) % segmentCount;
+        const newSegments = [...selectedSegments.value];
+        newSegments[circleIndex] = segment;
+        selectedSegments.value = newSegments;
+
+        break;
+      }
+    }
+  }
+};
+
+// Setup MIDI when component mounts
+onMounted(() => {
+  if (props.midiEnabled && typeof navigator.requestMIDIAccess === "function") {
+    navigator.requestMIDIAccess().then(
+      (midiAccess) => {
+        const inputs = midiAccess.inputs.values();
+        for (
+          let input = inputs.next();
+          input && !input.done;
+          input = inputs.next()
+        ) {
+          input.value.onmidimessage = handleMidiMessage;
+        }
+      },
+      (error) => {
+        console.error("MIDI access failed:", error);
+      },
+    );
+  }
+});
+
+onUnmounted(() => {
+  // Cleanup MIDI listeners when component unmounts
+  if (props.midiEnabled && typeof navigator.requestMIDIAccess === "function") {
+    navigator.requestMIDIAccess().then((midiAccess) => {
+      const inputs = midiAccess.inputs.values();
+      for (
+        let input = inputs.next();
+        input && !input.done;
+        input = inputs.next()
+      ) {
+        input.value.onmidimessage = null;
+      }
+    });
+  }
+});
 
 const getSegmentStyle = (segmentIndex, circleIndex) => {
   const segmentCount = props.segmentCounts[circleIndex] || 8;
