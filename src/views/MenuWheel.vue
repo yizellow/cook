@@ -7,14 +7,11 @@
       <div class="main-content">
         <!-- Left: Wheel Selector -->
         <div class="wheel-section">
-          <WheelSelector
-            :selectedSnack="selectedSnack"
-            :selectedChef="selectedChef"
-            :selectedMenuItem="selectedMenuItem"
-            :availableMenuItems="availableMenuItems"
-            @select-snack="selectSnack"
-            @select-chef="selectChef"
-            @select-menu-item="selectMenuItem"
+          <RadialInterface
+            :layers="[menuConfig.snacks, menuConfig.chefs, availableMenuItems]"
+            :selectedSegments="radialSegments"
+            @update:selectedSegments="onRadialSelectedSegmentsChange"
+            :size="340"
           />
         </div>
 
@@ -42,10 +39,12 @@
 </template>
 
 <script setup>
-import WheelSelector from '../components/WheelSelector.vue';
+import { computed, ref, watch } from 'vue';
+import RadialInterface from '../components/RadialInterface.vue';
 import DynamicForm from '../components/DynamicForm.vue';
 import SelectionSummary from '../components/SelectionSummary.vue';
 import { useMenuSelection } from '../composables/useMenuSelection.js';
+import { menuConfig } from '../config/menuConfig.js';
 
 const {
   selectedSnack,
@@ -59,6 +58,56 @@ const {
   selectMenuItem,
   updateParameter
 } = useMenuSelection();
+
+const radialSegments = ref([0, 0, 0]);
+
+const syncRadialSegments = () => {
+  const snackIndex = menuConfig.snacks.findIndex(
+    (snack) => snack.id === selectedSnack.value?.id,
+  );
+  const chefIndex = menuConfig.chefs.findIndex(
+    (chef) => chef.id === selectedChef.value?.id,
+  );
+  const menuIndex = availableMenuItems.value.findIndex(
+    (item) => item.id === selectedMenuItem.value?.id,
+  );
+
+  radialSegments.value = [
+    snackIndex >= 0 ? snackIndex : 0,
+    chefIndex >= 0 ? chefIndex : 0,
+    menuIndex >= 0 ? menuIndex : 0,
+  ];
+};
+
+syncRadialSegments();
+
+watch(
+  [selectedSnack, selectedChef, selectedMenuItem, availableMenuItems],
+  syncRadialSegments,
+  { deep: true },
+);
+
+const onRadialSelectedSegmentsChange = (segments) => {
+  if (!Array.isArray(segments)) return;
+
+  const [snackIndex, chefIndex, menuIndex] = segments;
+  const snack = menuConfig.snacks[snackIndex] || menuConfig.snacks[0];
+  const chef = menuConfig.chefs[chefIndex] || menuConfig.chefs[0];
+
+  if (snack && snack.id !== selectedSnack.value?.id) {
+    selectSnack(snack);
+  }
+
+  if (chef && chef.id !== selectedChef.value?.id) {
+    selectChef(chef);
+  }
+
+  const items = (chef?.menuItems || []);
+  const menuItem = items[menuIndex] || items[0];
+  if (menuItem && menuItem.id !== selectedMenuItem.value?.id) {
+    selectMenuItem(menuItem);
+  }
+};
 
 const goBack = () => {
   window.location.hash = "#/menu";

@@ -1,18 +1,10 @@
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted } from "vue";
 
 const props = defineProps({
-  layers: {
-    type: Array,
-    default: () => [[], [], []],
-  },
   segmentCounts: {
     type: Array,
-    default: () => [8, 8, 8], // fallback counts if layers are empty
-  },
-  selectedSegments: {
-    type: Array,
-    default: () => [0, 0, 0],
+    default: () => [8, 8, 8], // [inner, middle, outer] circle segment counts
   },
   size: {
     type: Number,
@@ -32,31 +24,10 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:selectedSegments']);
-
 const selectedCircle = ref(null);
-const internalSelectedSegments = ref([...props.selectedSegments]);
+const selectedSegments = ref([null, null, null]);
 const selectionAngles = ref([0, 0, 0]);
-
-const circleSegmentCounts = computed(() => {
-  return props.layers.map((layer, index) => {
-    return layer?.length || props.segmentCounts[index] || 8;
-  });
-});
-
-watch(
-  () => props.selectedSegments,
-  (newSegments) => {
-    if (Array.isArray(newSegments)) {
-      internalSelectedSegments.value = [...newSegments];
-    }
-  },
-  { deep: true, immediate: true }
-);
-
-const emitSelectedSegments = (segments) => {
-  emit('update:selectedSegments', [...segments]);
-};
+// One selected segment per circle
 
 const handleCircleMouseEnter = (circleIndex) => {
   selectedCircle.value = circleIndex;
@@ -71,61 +42,67 @@ const handleWheel = (e, circleIndex) => {
 
   if (selectedCircle.value !== circleIndex) return;
 
+  // Get current angle or initialize to 0
   const currentAngle = selectionAngles.value[circleIndex] || 0;
-  const scrollDelta = e.deltaY * 0.01;
-  let newAngle = currentAngle - scrollDelta;
+
+  // Calculate delta in radians with smooth scrolling
+  const scrollDelta = e.deltaY * 0.01; // Adjust sensitivity as needed
+  let newAngle = currentAngle - scrollDelta; // Negative for natural scroll direction
+
+  // Smooth wrapping: ensure angle stays within 0 to 2π range
   newAngle = wrapAngle(newAngle);
+
+  // Update the angle for this circle
   selectionAngles.value[circleIndex] = newAngle;
 
-  const segmentCount = circleSegmentCounts.value[circleIndex];
+  // Calculate which segment this angle corresponds to
+  const segmentCount = props.segmentCounts[circleIndex] || 8;
   const segment =
     Math.round((newAngle / (Math.PI * 2)) * segmentCount) % segmentCount;
 
-  const newSegments = [...internalSelectedSegments.value];
+  // Update only this circle's selected segment
+  const newSegments = [...selectedSegments.value];
   newSegments[circleIndex] = segment;
-  internalSelectedSegments.value = newSegments;
-  emitSelectedSegments(newSegments);
-};
-
-const selectSegment = (circleIndex, segmentIndex) => {
-  const newSegments = [...internalSelectedSegments.value];
-  newSegments[circleIndex] = segmentIndex;
-  internalSelectedSegments.value = newSegments;
-  emitSelectedSegments(newSegments);
+  selectedSegments.value = newSegments;
 };
 
 const wrapAngle = (angle) => {
+  // Ensure angle is always positive and within 0 to 2π range
   const wrapped = angle % (Math.PI * 2);
   return wrapped < 0 ? wrapped + Math.PI * 2 : wrapped;
 };
 
 const mapMidiToAngle = (midiValue) => {
+  // Map MIDI value (0-127) to angle (0 to 2π)
   return (midiValue / 127) * Math.PI * 2;
 };
 
 const handleMidiMessage = (event) => {
+  // console.log(event.data);
   const [status, data1, data2] = event.data;
 
+  // Check if it's a control change message
   if ((status & 0xf0) === 0xb0) {
     const channel = status & 0x0f;
     const controlNumber = data1;
     const midiValue = data2;
-
+    // Find which circle this MIDI message corresponds to
     for (let circleIndex = 0; circleIndex < 3; circleIndex++) {
       if (
         props.midiChannels[circleIndex] === channel &&
         props.midiControlNumbers[circleIndex] === controlNumber
       ) {
+        // Map MIDI value to angle and update
         const newAngle = mapMidiToAngle(midiValue);
         selectionAngles.value[circleIndex] = newAngle;
 
-        const segmentCount = circleSegmentCounts.value[circleIndex];
+        // Update the selected segment
+        const segmentCount = props.segmentCounts[circleIndex] || 8;
         const segment =
           Math.floor((newAngle / (Math.PI * 2)) * segmentCount) % segmentCount;
-        const newSegments = [...internalSelectedSegments.value];
+        const newSegments = [...selectedSegments.value];
         newSegments[circleIndex] = segment;
-        internalSelectedSegments.value = newSegments;
-        emitSelectedSegments(newSegments);
+        selectedSegments.value = newSegments;
 
         break;
       }
@@ -133,8 +110,9 @@ const handleMidiMessage = (event) => {
   }
 };
 
+// Setup MIDI when component mounts
 onMounted(() => {
-  if (props.midiEnabled && typeof navigator.requestMIDIAccess === 'function') {
+  if (props.midiEnabled && typeof navigator.requestMIDIAccess === "function") {
     navigator.requestMIDIAccess().then(
       (midiAccess) => {
         const inputs = midiAccess.inputs.values();
@@ -147,14 +125,15 @@ onMounted(() => {
         }
       },
       (error) => {
-        console.error('MIDI access failed:', error);
-      }
+        console.error("MIDI access failed:", error);
+      },
     );
   }
 });
 
 onUnmounted(() => {
-  if (props.midiEnabled && typeof navigator.requestMIDIAccess === 'function') {
+  // Cleanup MIDI listeners when component unmounts
+  if (props.midiEnabled && typeof navigator.requestMIDIAccess === "function") {
     navigator.requestMIDIAccess().then((midiAccess) => {
       const inputs = midiAccess.inputs.values();
       for (
@@ -168,21 +147,17 @@ onUnmounted(() => {
   }
 });
 
-const getSegmentLabel = (segmentIndex, circleIndex) => {
-  const item = props.layers?.[circleIndex]?.[segmentIndex];
-  return item?.name || segmentIndex + 1;
-};
-
 const getSegmentStyle = (segmentIndex, circleIndex) => {
-  const segmentCount = circleSegmentCounts.value[circleIndex];
+  const segmentCount = props.segmentCounts[circleIndex] || 8;
   const angle = segmentIndex * (360 / segmentCount) * (Math.PI / 180);
-  const radius = props.size * (0.3 + circleIndex * 0.2);
+  const radius = props.size * (0.3 + circleIndex * 0.2); // 30%, 50%, 70% of size
 
   const x = Math.cos(angle) * radius + props.size / 2;
   const y = Math.sin(angle) * radius + props.size / 2;
+
   const segmentSize = props.size * 0.12;
 
-  const isSelected = internalSelectedSegments.value[circleIndex] === segmentIndex;
+  const isSelected = selectedSegments.value[circleIndex] === segmentIndex;
   const isHoveredCircle = selectedCircle.value === circleIndex;
 
   return {
@@ -191,16 +166,16 @@ const getSegmentStyle = (segmentIndex, circleIndex) => {
     width: `${segmentSize}px`,
     height: `${segmentSize}px`,
     backgroundColor: isSelected
-      ? '#4CAF50'
+      ? "#4CAF50"
       : isHoveredCircle
-        ? '#8BC34A'
+        ? "#8BC34A"
         : circleIndex === 0
-          ? '#E0E0E0'
+          ? "#E0E0E0"
           : circleIndex === 1
-            ? '#BDBDBD'
-            : '#9E9E9E',
-    border: isSelected ? '3px solid #2E7D32' : 'none',
-    transform: isSelected ? 'scale(1.2)' : 'scale(1.0)',
+            ? "#BDBDBD"
+            : "#9E9E9E",
+    border: isSelected ? "3px solid #2E7D32" : "none",
+    transform: isSelected ? "scale(1.2)" : "scale(1.0)",
   };
 };
 
@@ -213,17 +188,18 @@ const getCircleStyle = (circleIndex) => {
     height: `${radius * 2}px`,
     left: `${props.size / 2 - radius}px`,
     top: `${props.size / 2 - radius}px`,
-    border: `4px solid ${isHovered ? '#FFC107' : circleIndex === 0 ? '#90CAF9' : circleIndex === 1 ? '#64B5F6' : '#42A5F5'}`,
-    backgroundColor: isHovered ? 'rgba(255, 193, 7, 0.1)' : 'transparent',
+    border: `4px solid ${isHovered ? "#FFC107" : circleIndex === 0 ? "#90CAF9" : circleIndex === 1 ? "#64B5F6" : "#42A5F5"}`,
+    backgroundColor: isHovered ? "rgba(255, 193, 7, 0.1)" : "transparent",
   };
 };
 
 const getCursorStyle = (circleIndex) => {
   const angle = selectionAngles.value[circleIndex];
-  const radius = props.size * (0.3 + circleIndex * 0.2);
+  const radius = props.size * (0.3 + circleIndex * 0.2); // 30%, 50%, 70% of size
 
   const x = Math.cos(angle) * radius + props.size / 2;
   const y = Math.sin(angle) * radius + props.size / 2;
+
   const cursorSize = props.size * 0.1;
 
   return {
@@ -254,14 +230,13 @@ const getCursorStyle = (circleIndex) => {
     <!-- Segments for each circle -->
     <div v-for="circleIndex in [2, 1, 0]" :key="`segments-${circleIndex}`">
       <div
-        v-for="segmentIndex in circleSegmentCounts[circleIndex]"
+        v-for="segmentIndex in props.segmentCounts[circleIndex] || 8"
         :key="`${circleIndex}-${segmentIndex}`"
         class="radial-segment"
         :style="getSegmentStyle(segmentIndex - 1, circleIndex)"
-        @click.stop="selectSegment(circleIndex, segmentIndex - 1)"
       >
         <div class="segment-label">
-          {{ getSegmentLabel(segmentIndex - 1, circleIndex) }}
+          {{ segmentIndex }}
         </div>
       </div>
     </div>
