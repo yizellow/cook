@@ -16,7 +16,7 @@ const groupedOrders = computed(() => {
   const groups = {};
 
   orders.value.forEach((order) => {
-    const chef = order.order?.chefTitle || "Unknown Chef";
+    const chef = order.order?.chef?.name || "Unknown Chef";
     if (!groups[chef]) {
       groups[chef] = [];
     }
@@ -58,6 +58,42 @@ const clearAllOrders = () => {
 const goHome = () => {
   window.location.hash = "#/";
 };
+
+// 獲取參數列表用於顯示
+const getParameterList = (order) => {
+  const menuItem = order.order?.menuItem;
+  const parameters = order.order?.parameters || {};
+
+  if (!menuItem || !menuItem.parameters) return [];
+
+  return menuItem.parameters.map(param => ({
+    id: param.id,
+    name: param.name,
+    value: formatParameterValue(param, parameters[param.id])
+  }));
+};
+
+// 格式化參數值顯示
+const formatParameterValue = (param, value) => {
+  if (value === undefined || value === null) return 'Not set';
+
+  switch (param.type) {
+    case 'percentage':
+      return `${value}%`;
+    case 'range':
+      return value;
+    case 'spectrum':
+      return `${value}%`;
+    case 'boolean':
+      return value ? 'Yes' : 'No';
+    case 'single-choice':
+      return value;
+    case 'text':
+      return value || 'Not provided';
+    default:
+      return value;
+  }
+};
 </script>
 
 <template>
@@ -83,8 +119,10 @@ const goHome = () => {
             <div class="table-header">
               <div class="col col-name">Name</div>
               <div class="col col-email">Email</div>
+              <div class="col col-snack">Snack</div>
               <div class="col col-chef">Chef</div>
-              <div class="col col-answers">Answers</div>
+              <div class="col col-item">Menu Item</div>
+              <div class="col col-params">Parameters</div>
               <div class="col col-date">Created At</div>
               <div class="col col-action">Action</div>
             </div>
@@ -96,16 +134,16 @@ const goHome = () => {
             >
               <div class="col col-name">{{ order.customer?.name }}</div>
               <div class="col col-email">{{ order.customer?.email }}</div>
-              <div class="col col-chef">{{ order.order?.chefTitle }}</div>
-              <div class="col col-answers">
-                <div class="answer-item">
-                  <strong>Q1:</strong> {{ order.order?.answers?.question1 }}%
-                </div>
-                <div class="answer-item">
-                  <strong>Q2:</strong> {{ order.order?.answers?.question2 }}
-                </div>
-                <div class="answer-item">
-                  <strong>Q3:</strong> {{ order.order?.answers?.question3 }}
+              <div class="col col-snack">{{ order.order?.snack?.name || 'None' }}</div>
+              <div class="col col-chef">{{ order.order?.chef?.name }}</div>
+              <div class="col col-item">{{ order.order?.menuItem?.name }}</div>
+              <div class="col col-params">
+                <div
+                  v-for="param in getParameterList(order)"
+                  :key="param.id"
+                  class="param-item"
+                >
+                  <strong>{{ param.name }}:</strong> {{ param.value }}
                 </div>
               </div>
               <div class="col col-date">{{ order.createdAt }}</div>
@@ -178,16 +216,14 @@ const goHome = () => {
 .table-row {
   display: grid;
   grid-template-columns:
-    120px
-    180px
-    100px
-    120px
-    100px
-    80px
-    80px
-    80px
-    130px
-    80px;
+    120px    /* Name */
+    180px    /* Email */
+    100px    /* Snack */
+    120px    /* Chef */
+    120px    /* Menu Item */
+    200px    /* Parameters */
+    130px    /* Date */
+    80px;    /* Action */
   gap: 10px;
   padding: 12px 10px;
   border-bottom: 1px solid #ddd;
@@ -205,7 +241,6 @@ const goHome = () => {
 
 .table-row {
   background-color: #fff;
-  transition: background-color 0.2s;
 
   &:hover {
     background-color: #f9f9f9;
@@ -247,7 +282,6 @@ const goHome = () => {
   border-radius: 4px;
   cursor: pointer;
   font-size: 12px;
-  transition: background-color 0.2s;
 
   &:hover {
     background-color: #cc0000;
@@ -271,7 +305,6 @@ const goHome = () => {
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.2s;
 
   &:hover {
     background-color: #444;
@@ -286,11 +319,21 @@ const goHome = () => {
   }
 }
 
+.param-item {
+  font-size: 11px;
+  margin-bottom: 2px;
+  line-height: 1.2;
+}
+
+.param-item:last-child {
+  margin-bottom: 0;
+}
+
 /* 响应式设计 */
 @media (max-width: 1200px) {
   .table-header,
   .table-row {
-    grid-template-columns: 100px 150px 80px 100px 80px 70px 70px 70px 110px 70px;
+    grid-template-columns: 100px 150px 80px 100px 100px 150px 110px 70px;
     font-size: 12px;
   }
 }
@@ -298,7 +341,7 @@ const goHome = () => {
 @media (max-width: 768px) {
   .table-header,
   .table-row {
-    grid-template-columns: 80px 120px 70px 80px 70px 60px 60px 60px 90px 60px;
+    grid-template-columns: 80px 120px 70px 80px 80px 120px 90px 60px;
     gap: 5px;
     padding: 8px 5px;
     font-size: 11px;
@@ -310,7 +353,7 @@ const goHome = () => {
 
   .table-header,
   .table-row {
-    grid-template-columns: 80px 70px 80px 70px 60px 60px 60px 90px 60px;
+    grid-template-columns: 80px 70px 80px 80px 120px 90px 60px;
   }
 }
 </style>

@@ -74,7 +74,6 @@ const goNext = () => {
   background: white;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s;
 }
 
 .menu-item-card:hover {

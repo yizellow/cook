@@ -68,7 +68,6 @@ const goOrders = () => {
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.2s;
 
   &:hover {
     background-color: #444;

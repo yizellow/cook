@@ -64,7 +64,6 @@ const goNext = () => {
   border-radius: 8px;
   text-align: left;
   cursor: pointer;
-  transition: all 0.3s;
 }
 
 .chef-btn:hover {

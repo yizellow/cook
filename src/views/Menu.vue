@@ -2,7 +2,7 @@
 const name = localStorage.getItem("art_name") || "";
 
 const goChefSelect = () => {
-  window.location.hash = "#/chef-select";
+  window.location.hash = "#/menu-wheel";
 };
 
 const goBack = () => {

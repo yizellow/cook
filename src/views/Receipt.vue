@@ -2,8 +2,10 @@
 const name = localStorage.getItem("art_name") || "Not provided";
 const email = localStorage.getItem("art_email") || "Not provided";
 
+const selectedSnack = JSON.parse(localStorage.getItem("selectedSnack") || "null");
 const selectedChef = JSON.parse(localStorage.getItem("selectedChef") || "null");
-const answers = JSON.parse(localStorage.getItem("answers") || "{}");
+const selectedMenuItem = JSON.parse(localStorage.getItem("selectedMenuItem") || "null");
+const parameterValues = JSON.parse(localStorage.getItem("parameterValues") || "{}");
 
 const submitOrder = () => {
   // 建立訂單物件
@@ -14,9 +16,10 @@ const submitOrder = () => {
       email,
     },
     order: {
-      chefId: selectedChef?.id,
-      chefTitle: selectedChef?.title,
-      answers,
+      snack: selectedSnack,
+      chef: selectedChef,
+      menuItem: selectedMenuItem,
+      parameters: parameterValues,
     },
     createdAt: new Date().toLocaleString(),
   };
@@ -33,19 +36,42 @@ const submitOrder = () => {
   // 清除當前訂單數據
   localStorage.removeItem("art_name");
   localStorage.removeItem("art_email");
+  localStorage.removeItem("selectedSnack");
   localStorage.removeItem("selectedChef");
-  localStorage.removeItem("answers");
+  localStorage.removeItem("selectedMenuItem");
+  localStorage.removeItem("parameterValues");
 
   alert("Order submitted successfully! / Bestellung erfolgreich eingereicht!");
   window.location.hash = "#/orders";
 };
 
 const goBack = () => {
-  window.location.hash = "#/chef-detail";
+  window.location.hash = "#/menu-wheel";
 };
 
 const goHome = () => {
   window.location.hash = "#/";
+};
+
+const formatParameterValue = (param, value) => {
+  if (value === undefined || value === null) return 'Not set';
+
+  switch (param.type) {
+    case 'percentage':
+      return `${value}%`;
+    case 'range':
+      return value;
+    case 'spectrum':
+      return `${value}%`;
+    case 'boolean':
+      return value ? 'Yes' : 'No';
+    case 'single-choice':
+      return value;
+    case 'text':
+      return value || 'Not provided';
+    default:
+      return value;
+  }
 };
 </script>
 
@@ -63,22 +89,20 @@ const goHome = () => {
 
       <div class="receipt-section">
         <h2>Order</h2>
-        <p><strong>Chef:</strong> {{ selectedChef?.title }}</p>
+        <p><strong>Snack:</strong> {{ selectedSnack?.name || 'None' }}</p>
+        <p><strong>Chef:</strong> {{ selectedChef?.name || 'None' }}</p>
+        <p><strong>Menu Item:</strong> {{ selectedMenuItem?.name || 'None' }}</p>
       </div>
 
-      <div class="receipt-section">
-        <h2>Answers</h2>
-        <div class="answer-item">
-          <strong>{{ selectedChef?.question1.title }}:</strong>
-          <span>{{ answers.question1 }}%</span>
-        </div>
-        <div class="answer-item">
-          <strong>{{ selectedChef?.question2.title }}:</strong>
-          <span>{{ answers.question2 }}</span>
-        </div>
-        <div class="answer-item">
-          <strong>{{ selectedChef?.question3.title }}:</strong>
-          <span>{{ answers.question3 }}</span>
+      <div class="receipt-section" v-if="selectedMenuItem">
+        <h2>Parameters</h2>
+        <div
+          v-for="param in selectedMenuItem.parameters"
+          :key="param.id"
+          class="parameter-item"
+        >
+          <strong>{{ param.name }}:</strong>
+          <span>{{ formatParameterValue(param, parameterValues[param.id]) }}</span>
         </div>
       </div>
 

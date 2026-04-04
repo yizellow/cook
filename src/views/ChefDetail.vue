@@ -10,6 +10,7 @@ const answers = ref({
   question3: selectedChef.value?.question3?.default || 1,
 });
 
+
 const goBack = () => {
   window.location.hash = "#/chef-select";
 };
@@ -158,7 +159,6 @@ const goNext = () => {
   background: white;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s;
   font-size: 1rem;
 }
 

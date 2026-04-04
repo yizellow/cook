@@ -2,7 +2,7 @@
 import { ref, computed } from "vue";
 import Home from "./views/Home.vue";
 import Menu from "./views/Menu.vue";
-import ChefSelect from "./views/ChefSelect.vue";
+import MenuWheel from "./views/MenuWheel.vue";
 import ChefDetail from "./views/ChefDetail.vue";
 import Receipt from "./views/Receipt.vue";
 import Orders from "./views/Orders.vue";
@@ -11,7 +11,7 @@ import NotFound from "./views/NotFound.vue";
 const routes = {
   "/": Home,
   "/menu": Menu,
-  "/chef-select": ChefSelect,
+  "/menu-wheel": MenuWheel,
   "/chef-detail": ChefDetail,
   "/receipt": Receipt,
   "/orders": Orders,
