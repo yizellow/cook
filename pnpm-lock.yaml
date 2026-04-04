@@ -11,6 +11,9 @@ importers:
       '@sanity/client':
         specifier: ^7.20.0
         version: 7.20.0
+      get-it:
+        specifier: ^8.7.0
+        version: 8.7.0
       vue:
         specifier: ^3.5.29
         version: 3.5.31
