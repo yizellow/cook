@@ -1,28 +1,30 @@
-const { createClient } = require("@sanity/client");
+exports.handler = async (event) => {
+  const headers = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Content-Type": "application/json",
+  };
 
-// Initialize Sanity client with write token
-const client = createClient({
-  projectId: process.env.SANITY_PROJECT_ID,
-  dataset: process.env.SANITY_DATASET,
-  apiVersion: process.env.SANITY_API_VERSION,
-  token: process.env.SANITY_API_TOKEN,
-  useCdn: false, // Must be false when using token
-});
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ ok: true }),
+    };
+  }
 
-exports.handler = async (event, context) => {
-  // Only allow POST requests
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
+      headers,
       body: JSON.stringify({ error: "Method not allowed" }),
     };
   }
 
   try {
-    // Parse the request body
-    const { customer, order } = JSON.parse(event.body);
+    const { customer, order } = JSON.parse(event.body || "{}");
 
-    // Validate required fields
     if (
       !customer?.name ||
       !customer?.email ||
@@ -32,11 +34,26 @@ exports.handler = async (event, context) => {
     ) {
       return {
         statusCode: 400,
+        headers,
         body: JSON.stringify({ error: "Missing required fields" }),
       };
     }
 
-    // Create the order document
+    const projectId = process.env.SANITY_PROJECT_ID;
+    const dataset = process.env.SANITY_DATASET;
+    const apiVersion = process.env.SANITY_API_VERSION || "2024-01-01";
+    const token = process.env.SANITY_API_TOKEN;
+
+    if (!projectId || !dataset || !token) {
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({
+          error: "Missing Sanity environment variables",
+        }),
+      };
+    }
+
     const orderDocument = {
       _type: "order",
       customer: {
@@ -47,26 +64,48 @@ exports.handler = async (event, context) => {
         chefId: order.chefId,
         chefTitle: order.chefTitle,
         answers: {
-          question1: order.answers.question1,
-          question2: order.answers.question2,
-          question3: order.answers.question3,
+          question1: order.answers.question1 ?? "",
+          question2: order.answers.question2 ?? "",
+          question3: order.answers.question3 ?? "",
         },
       },
     };
 
-    // Save to Sanity
-    const result = await client.create(orderDocument);
+    const url = `https://${projectId}.api.sanity.io/v${apiVersion}/data/mutate/${dataset}`;
+
+    const sanityRes = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        mutations: [{ create: orderDocument }],
+      }),
+    });
+
+    const sanityData = await sanityRes.json();
+
+    if (!sanityRes.ok) {
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({
+          error: "Failed to create order in Sanity",
+          details: sanityData,
+        }),
+      };
+    }
+
+    const createdId =
+      sanityData?.results?.[0]?.id || sanityData?.transactionId || null;
 
     return {
       statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-      },
+      headers,
       body: JSON.stringify({
         success: true,
-        orderId: result._id,
+        orderId: createdId,
         message: "Order created successfully",
       }),
     };
@@ -75,11 +114,7 @@ exports.handler = async (event, context) => {
 
     return {
       statusCode: 500,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-      },
+      headers,
       body: JSON.stringify({
         error: "Failed to create order",
         details: error.message,
