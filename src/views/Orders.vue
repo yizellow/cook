@@ -2,21 +2,36 @@
 import { ref, computed, onMounted } from "vue";
 
 const orders = ref([]);
+const isLoading = ref(true);
+const loadError = ref("");
 
-// 在组件挂载时从 localStorage 加载订单
-onMounted(() => {
-  const savedOrders = localStorage.getItem("art_orders");
-  if (savedOrders) {
-    orders.value = JSON.parse(savedOrders);
+onMounted(async () => {
+  try {
+    const res = await fetch("/api/get-orders");
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data?.error || "Failed to load orders");
+    }
+
+    if (data.success) {
+      orders.value = Array.isArray(data.orders) ? data.orders : [];
+    } else {
+      orders.value = [];
+    }
+  } catch (error) {
+    console.error("Failed to load orders:", error);
+    loadError.value = error.message || "Failed to load orders";
+  } finally {
+    isLoading.value = false;
   }
 });
 
-// 按 Chef 分组
 const groupedOrders = computed(() => {
   const groups = {};
 
   orders.value.forEach((order) => {
-    const chef = order.order?.chef?.name || "Unknown Chef";
+    const chef = order.order?.chefName || "Unknown Chef";
     if (!groups[chef]) {
       groups[chef] = [];
     }
@@ -26,73 +41,27 @@ const groupedOrders = computed(() => {
   return groups;
 });
 
-// 获取所有唯一的 Chef 类别
 const categories = computed(() => {
   return Object.keys(groupedOrders.value).sort();
 });
-
-// 删除订单
-const deleteOrder = (orderId) => {
-  if (
-    confirm(
-      "Are you sure you want to delete this order? / Sind Sie sicher, dass Sie diese Bestellung löschen möchten?",
-    )
-  ) {
-    orders.value = orders.value.filter((order) => order.id !== orderId);
-    localStorage.setItem("art_orders", JSON.stringify(orders.value));
-  }
-};
-
-// 清空所有订单
-const clearAllOrders = () => {
-  if (
-    confirm(
-      "Are you sure you want to delete all orders? / Sind Sie sicher, dass Sie alle Bestellungen löschen möchten?",
-    )
-  ) {
-    orders.value = [];
-    localStorage.removeItem("art_orders");
-  }
-};
 
 const goHome = () => {
   window.location.hash = "#/";
 };
 
-// 獲取參數列表用於顯示
 const getParameterList = (order) => {
-  const menuItem = order.order?.menuItem;
-  const parameters = order.order?.parameters || {};
-
-  if (!menuItem || !menuItem.parameters) return [];
-
-  return menuItem.parameters.map(param => ({
-    id: param.id,
-    name: param.name,
-    value: formatParameterValue(param, parameters[param.id])
-  }));
+  const parameters = order.order?.parameters || [];
+  return Array.isArray(parameters) ? parameters : [];
 };
 
-// 格式化參數值顯示
-const formatParameterValue = (param, value) => {
-  if (value === undefined || value === null) return 'Not set';
+const deleteOrder = (orderId) => {
+  alert(
+    `Delete function is not connected to database yet. Order ID: ${orderId}`,
+  );
+};
 
-  switch (param.type) {
-    case 'percentage':
-      return `${value}%`;
-    case 'range':
-      return value;
-    case 'spectrum':
-      return `${value}%`;
-    case 'boolean':
-      return value ? 'Yes' : 'No';
-    case 'single-choice':
-      return value;
-    case 'text':
-      return value || 'Not provided';
-    default:
-      return value;
-  }
+const clearAllOrders = () => {
+  alert("Clear All is not connected to database yet.");
 };
 </script>
 
@@ -102,12 +71,18 @@ const formatParameterValue = (param, value) => {
       <h1 class="title">Order Management / Bestellungsverwaltung</h1>
       <p class="subtitle">All Orders / Alle Bestellungen</p>
 
-      <!-- 未有订单时的提示 -->
-      <div v-if="orders.length === 0" class="no-orders">
+      <div v-if="isLoading" class="no-orders">
+        <p>Loading orders... / Bestellungen werden geladen...</p>
+      </div>
+
+      <div v-else-if="loadError" class="no-orders">
+        <p>{{ loadError }}</p>
+      </div>
+
+      <div v-else-if="orders.length === 0" class="no-orders">
         <p>No orders yet. / Noch keine Bestellungen.</p>
       </div>
 
-      <!-- 按类别显示订单 -->
       <div v-else class="orders-container">
         <div
           v-for="category in categories"
@@ -115,6 +90,7 @@ const formatParameterValue = (param, value) => {
           class="category-section"
         >
           <h2 class="category-title">{{ category }}</h2>
+
           <div class="orders-table">
             <div class="table-header">
               <div class="col col-name">Name</div>
@@ -129,14 +105,25 @@ const formatParameterValue = (param, value) => {
 
             <div
               v-for="order in groupedOrders[category]"
-              :key="order.id"
+              :key="order._id"
               class="table-row"
             >
-              <div class="col col-name">{{ order.customer?.name }}</div>
-              <div class="col col-email">{{ order.customer?.email }}</div>
-              <div class="col col-snack">{{ order.order?.snack?.name || 'None' }}</div>
-              <div class="col col-chef">{{ order.order?.chef?.name }}</div>
-              <div class="col col-item">{{ order.order?.menuItem?.name }}</div>
+              <div class="col col-name">
+                {{ order.customer?.name || "Unknown" }}
+              </div>
+              <div class="col col-email">
+                {{ order.customer?.email || "Unknown" }}
+              </div>
+              <div class="col col-snack">
+                {{ order.order?.snackName || "None" }}
+              </div>
+              <div class="col col-chef">
+                {{ order.order?.chefName || "Unknown Chef" }}
+              </div>
+              <div class="col col-item">
+                {{ order.order?.menuItemName || "Unknown Item" }}
+              </div>
+
               <div class="col col-params">
                 <div
                   v-for="param in getParameterList(order)"
@@ -146,9 +133,17 @@ const formatParameterValue = (param, value) => {
                   <strong>{{ param.name }}:</strong> {{ param.value }}
                 </div>
               </div>
-              <div class="col col-date">{{ order.createdAt }}</div>
+
+              <div class="col col-date">
+                {{
+                  order.createdAt
+                    ? new Date(order.createdAt).toLocaleString()
+                    : "Unknown"
+                }}
+              </div>
+
               <div class="col col-action">
-                <button class="delete-btn" @click="deleteOrder(order.id)">
+                <button class="delete-btn" @click="deleteOrder(order._id)">
                   Delete
                 </button>
               </div>
@@ -157,7 +152,6 @@ const formatParameterValue = (param, value) => {
         </div>
       </div>
 
-      <!-- 底部操作按钮 -->
       <div class="nav-buttons">
         <button class="back-btn" @click="goHome">Back / Zurück</button>
         <button
@@ -216,18 +210,18 @@ const formatParameterValue = (param, value) => {
 .table-row {
   display: grid;
   grid-template-columns:
-    120px    /* Name */
-    180px    /* Email */
-    100px    /* Snack */
-    120px    /* Chef */
-    120px    /* Menu Item */
-    200px    /* Parameters */
-    130px    /* Date */
-    80px;    /* Action */
+    120px
+    180px
+    100px
+    120px
+    120px
+    200px
+    160px
+    90px;
   gap: 10px;
   padding: 12px 10px;
   border-bottom: 1px solid #ddd;
-  align-items: center;
+  align-items: start;
   font-size: 13px;
 }
 
@@ -262,11 +256,15 @@ const formatParameterValue = (param, value) => {
 
   &.col-date {
     font-size: 12px;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
   }
 
-  &.col-sauces {
-    text-align: center;
-    color: #666;
+  &.col-params {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
   }
 
   &.col-action {
@@ -321,19 +319,18 @@ const formatParameterValue = (param, value) => {
 
 .param-item {
   font-size: 11px;
-  margin-bottom: 2px;
-  line-height: 1.2;
+  margin-bottom: 4px;
+  line-height: 1.3;
 }
 
 .param-item:last-child {
   margin-bottom: 0;
 }
 
-/* 响应式设计 */
 @media (max-width: 1200px) {
   .table-header,
   .table-row {
-    grid-template-columns: 100px 150px 80px 100px 100px 150px 110px 70px;
+    grid-template-columns: 100px 150px 80px 100px 100px 150px 120px 70px;
     font-size: 12px;
   }
 }
