@@ -2,137 +2,385 @@
 export const menuConfig = {
   // Layer 1: Snacks (independent state, doesn't affect right panel)
   snacks: [
-    { id: 'menu', name: 'Menu', description: 'Standard menu flow' },
-    { id: 'snack', name: 'Snack', description: 'Quick snack option' }
+    { id: "menu", name: "Menu", description: "Standard menu flow" },
+    { id: "snack", name: "Snack", description: "Quick snack option" },
   ],
 
   // Layer 2: Chefs/Media (determines menuItems and right panel scope)
   chefs: [
     {
-      id: 'drawing',
-      name: 'Drawing',
+      id: "drawing",
+      name: "Drawing",
       menuItems: [
         {
-          id: 'landscape',
-          name: 'Landscape',
+          id: "landscape",
+          name: "Landscape",
           parameters: [
-            { id: 'trees', name: 'Trees', type: 'percentage', min: 0, max: 100, default: 30 },
-            { id: 'stones', name: 'Stones', type: 'percentage', min: 0, max: 100, default: 20 },
-            { id: 'mountains', name: 'Mountains', type: 'range', min: 1, max: 10, default: 6 },
-            { id: 'waterFeatures', name: 'Water Features', type: 'boolean', default: false }
-          ]
+            {
+              id: "trees",
+              name: "Trees",
+              type: "percentage",
+              min: 0,
+              max: 100,
+              default: 30,
+            },
+            {
+              id: "stones",
+              name: "Stones",
+              type: "percentage",
+              min: 0,
+              max: 100,
+              default: 20,
+            },
+            {
+              id: "mountains",
+              name: "Mountains",
+              type: "range",
+              min: 1,
+              max: 10,
+              default: 6,
+            },
+            {
+              id: "waterFeatures",
+              name: "Water Features",
+              type: "boolean",
+              default: false,
+            },
+          ],
         },
         {
-          id: 'human',
-          name: 'Human',
+          id: "human",
+          name: "Human",
           parameters: [
-            { id: 'gender', name: 'Gender', type: 'spectrum', min: -50, max: 50, labels: ['Female', 'Male'], default: 0 },
-            { id: 'age', name: 'Age', type: 'range', min: 1, max: 101, default: 25 },
-            { id: 'frame', name: 'Frame', type: 'single-choice', options: ['Full Body', 'Portrait', 'Close-up'], default: 'Portrait' },
-            { id: 'emotion', name: 'Emotion', type: 'single-choice', options: ['Sad', 'Happy', 'Confused', 'Suspicious', 'Focused'], default: 'Happy' }
-          ]
+            {
+              id: "gender",
+              name: "Gender",
+              type: "spectrum",
+              min: -50,
+              max: 50,
+              labels: ["Female", "Male"],
+              default: 0,
+            },
+            {
+              id: "age",
+              name: "Age",
+              type: "range",
+              min: 1,
+              max: 101,
+              default: 25,
+            },
+            {
+              id: "frame",
+              name: "Frame",
+              type: "single-choice",
+              options: ["Full Body", "Portrait", "Close-up"],
+              default: "Portrait",
+            },
+            {
+              id: "emotion",
+              name: "Emotion",
+              type: "single-choice",
+              options: ["Sad", "Happy", "Confused", "Suspicious", "Focused"],
+              default: "Happy",
+            },
+          ],
         },
         {
-          id: 'abstract',
-          name: 'Abstract',
+          id: "abstract",
+          name: "Abstract",
           parameters: [
-            { id: 'lines', name: 'Lines', type: 'percentage', min: 0, max: 100, default: 40 },
-            { id: 'points', name: 'Points', type: 'percentage', min: 0, max: 100, default: 30 },
-            { id: 'faces', name: 'Faces', type: 'percentage', min: 0, max: 100, default: 10 },
-            { id: 'monochromeColorful', name: 'Monochrome ↔ Colorful', type: 'spectrum', min: -50, max: 50, labels: ['Monochrome', 'Colorful'], default: 0 }
-          ]
+            {
+              id: "lines",
+              name: "Lines",
+              type: "percentage",
+              min: 0,
+              max: 100,
+              default: 40,
+            },
+            {
+              id: "points",
+              name: "Points",
+              type: "percentage",
+              min: 0,
+              max: 100,
+              default: 30,
+            },
+            {
+              id: "faces",
+              name: "Faces",
+              type: "percentage",
+              min: 0,
+              max: 100,
+              default: 10,
+            },
+            {
+              id: "monochromeColorful",
+              name: "Monochrome ↔ Colorful",
+              type: "spectrum",
+              min: -50,
+              max: 50,
+              labels: ["Monochrome", "Colorful"],
+              default: 0,
+            },
+          ],
         },
         {
-          id: 'object',
-          name: 'Object',
+          id: "object",
+          name: "Object",
           parameters: [
-            { id: 'approximateSize', name: 'Approximate Size', type: 'range', min: 0.01, max: 10, step: 0.01, default: 1 },
-            { id: 'mundaneSpecial', name: 'Mundane ↔ Special', type: 'spectrum', min: -50, max: 50, labels: ['Mundane', 'Special'], default: 0 },
-            { id: 'organicArtificial', name: 'Organic ↔ Artificial', type: 'spectrum', min: -50, max: 50, labels: ['Organic', 'Artificial'], default: 0 }
-          ]
-        }
-      ]
+            {
+              id: "approximateSize",
+              name: "Approximate Size",
+              type: "range",
+              min: 0.01,
+              max: 10,
+              step: 0.01,
+              default: 1,
+            },
+            {
+              id: "mundaneSpecial",
+              name: "Mundane ↔ Special",
+              type: "spectrum",
+              min: -50,
+              max: 50,
+              labels: ["Mundane", "Special"],
+              default: 0,
+            },
+            {
+              id: "organicArtificial",
+              name: "Organic ↔ Artificial",
+              type: "spectrum",
+              min: -50,
+              max: 50,
+              labels: ["Organic", "Artificial"],
+              default: 0,
+            },
+          ],
+        },
+      ],
     },
     {
-      id: '3d-rendering',
-      name: '3D Rendering',
+      id: "3d-rendering",
+      name: "3D Rendering",
       menuItems: [
         {
-          id: 'emotional-sculpture',
-          name: 'Emotional Sculpture',
+          id: "emotional-sculpture",
+          name: "Emotional Sculpture",
           parameters: [
-            { id: 'angry', name: 'Angry', type: 'percentage', min: 0, max: 100, default: 20 },
-            { id: 'excited', name: 'Excited', type: 'percentage', min: 0, max: 100, default: 30 },
-            { id: 'bored', name: 'Bored', type: 'percentage', min: 0, max: 100, default: 10 }
-          ]
+            {
+              id: "angry",
+              name: "Angry",
+              type: "percentage",
+              min: 0,
+              max: 100,
+              default: 20,
+            },
+            {
+              id: "excited",
+              name: "Excited",
+              type: "percentage",
+              min: 0,
+              max: 100,
+              default: 30,
+            },
+            {
+              id: "bored",
+              name: "Bored",
+              type: "percentage",
+              min: 0,
+              max: 100,
+              default: 10,
+            },
+          ],
         },
         {
-          id: 'cubic-structure',
-          name: 'Cubic Structure',
+          id: "cubic-structure",
+          name: "Cubic Structure",
           parameters: [
-            { id: 'colors', name: 'Colors', type: 'range', min: 1, max: 5, default: 3 },
-            { id: 'complexity', name: 'Complexity', type: 'percentage', min: 0, max: 100, default: 50 },
-            { id: 'material', name: 'Material', type: 'single-choice', options: ['Metallic', 'Glass', 'Opaque'], default: 'Metallic' }
-          ]
-        }
-      ]
+            {
+              id: "colors",
+              name: "Colors",
+              type: "range",
+              min: 1,
+              max: 5,
+              default: 3,
+            },
+            {
+              id: "complexity",
+              name: "Complexity",
+              type: "percentage",
+              min: 0,
+              max: 100,
+              default: 50,
+            },
+            {
+              id: "material",
+              name: "Material",
+              type: "single-choice",
+              options: ["Metallic", "Glass", "Opaque"],
+              default: "Metallic",
+            },
+          ],
+        },
+      ],
     },
     {
-      id: 'website',
-      name: 'Website',
+      id: "website",
+      name: "Website",
       menuItems: [
         {
-          id: 'game',
-          name: 'Game',
+          id: "game",
+          name: "Game",
           parameters: [
-            { id: 'speed', name: 'Speed', type: 'percentage', min: 0, max: 100, default: 60 },
-            { id: 'abstraction', name: 'Abstraction', type: 'percentage', min: 0, max: 100, default: 40 },
-            { id: 'interactivity', name: 'Interactivity', type: 'single-choice', options: ['Interactive', 'Autonomous'], default: 'Interactive' }
-          ]
+            {
+              id: "speed",
+              name: "Speed",
+              type: "percentage",
+              min: 0,
+              max: 100,
+              default: 60,
+            },
+            {
+              id: "abstraction",
+              name: "Abstraction",
+              type: "percentage",
+              min: 0,
+              max: 100,
+              default: 40,
+            },
+            {
+              id: "interactivity",
+              name: "Interactivity",
+              type: "single-choice",
+              options: ["Interactive", "Autonomous"],
+              default: "Interactive",
+            },
+          ],
         },
         {
-          id: 'interactive-typography',
-          name: 'Interactive Typography',
+          id: "interactive-typography",
+          name: "Interactive Typography",
           parameters: [
-            { id: 'fragileBold', name: 'Fragile ↔ Bold', type: 'spectrum', min: -50, max: 50, labels: ['Fragile', 'Bold'], default: 0 },
-            { id: 'illustrations', name: 'Illustrations', type: 'percentage', min: 0, max: 100, default: 50 },
-            { id: 'textSource', name: 'Text Source', type: 'single-choice', options: ['Novel', 'Poem', 'Magazine', 'Random'], default: 'Novel' }
-          ]
+            {
+              id: "fragileBold",
+              name: "Fragile ↔ Bold",
+              type: "spectrum",
+              min: -50,
+              max: 50,
+              labels: ["Fragile", "Bold"],
+              default: 0,
+            },
+            {
+              id: "illustrations",
+              name: "Illustrations",
+              type: "percentage",
+              min: 0,
+              max: 100,
+              default: 50,
+            },
+            {
+              id: "textSource",
+              name: "Text Source",
+              type: "single-choice",
+              options: ["Novel", "Poem", "Magazine", "Random"],
+              default: "Novel",
+            },
+          ],
         },
         {
-          id: 'advertisement',
-          name: 'Advertisement',
+          id: "advertisement",
+          name: "Advertisement",
           parameters: [
-            { id: 'language', name: 'Language', type: 'single-choice', options: ['Deutsch', 'English'], default: 'English' },
-            { id: 'seriousness', name: 'Seriousness', type: 'percentage', min: 0, max: 100, default: 50 },
-            { id: 'loudness', name: 'Loudness', type: 'percentage', min: 0, max: 100, default: 30 },
-            { id: 'category', name: 'Category', type: 'single-choice', options: ['Event', 'Product'], default: 'Product' },
-            { id: 'description', name: 'Description', type: 'text', placeholder: 'Tell the artist what you want to advertise', default: '' }
-          ]
-        }
-      ]
+            {
+              id: "language",
+              name: "Language",
+              type: "single-choice",
+              options: ["Deutsch", "English"],
+              default: "English",
+            },
+            {
+              id: "seriousness",
+              name: "Seriousness",
+              type: "percentage",
+              min: 0,
+              max: 100,
+              default: 50,
+            },
+            {
+              id: "loudness",
+              name: "Loudness",
+              type: "percentage",
+              min: 0,
+              max: 100,
+              default: 30,
+            },
+            {
+              id: "category",
+              name: "Category",
+              type: "single-choice",
+              options: ["Event", "Product"],
+              default: "Product",
+            },
+            {
+              id: "description",
+              name: "Description",
+              type: "text",
+              placeholder: "Tell the artist what you want to advertise",
+              default: "",
+            },
+          ],
+        },
+      ],
     },
     {
-      id: 'doodle',
-      name: 'Doodle',
+      id: "doodle",
+      name: "Doodle",
       menuItems: [
         {
-          id: 'category',
-          name: 'Category',
+          id: "category",
+          name: "Category",
           parameters: [
-            { id: 'category', name: 'Category', type: 'single-choice', options: ['Character', 'Monster', 'Landscape', 'Other'], default: 'Character' }
-          ]
+            {
+              id: "category",
+              name: "Category",
+              type: "single-choice",
+              options: ["Character", "Monster", "Landscape", "Other"],
+              default: "Character",
+            },
+          ],
         },
         {
-          id: 'mood',
-          name: 'Mood',
+          id: "mood",
+          name: "Mood",
           parameters: [
-            { id: 'moistDry', name: 'Moist ↔ Dry', type: 'spectrum', min: -50, max: 50, labels: ['Moist', 'Dry'], default: 0 },
-            { id: 'realityDream', name: 'Reality ↔ Dream', type: 'spectrum', min: -50, max: 50, labels: ['Reality', 'Dream'], default: 0 },
-            { id: 'seasons', name: 'Seasons', type: 'single-choice', options: ['Spring', 'Summer', 'Autumn', 'Winter'], default: 'Spring' }
-          ]
-        }
-      ]
-    }
-  ]
+            {
+              id: "moistDry",
+              name: "Moist ↔ Dry",
+              type: "spectrum",
+              min: -50,
+              max: 50,
+              labels: ["Moist", "Dry"],
+              default: 0,
+            },
+            {
+              id: "realityDream",
+              name: "Reality ↔ Dream",
+              type: "spectrum",
+              min: -50,
+              max: 50,
+              labels: ["Reality", "Dream"],
+              default: 0,
+            },
+            {
+              id: "seasons",
+              name: "Seasons",
+              type: "single-choice",
+              options: ["Spring", "Summer", "Autumn", "Winter"],
+              default: "Spring",
+            },
+          ],
+        },
+      ],
+    },
+  ],
 };

@@ -39,12 +39,12 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
-import RadialInterface from '../components/RadialInterface.vue';
-import DynamicForm from '../components/DynamicForm.vue';
-import SelectionSummary from '../components/SelectionSummary.vue';
-import { useMenuSelection } from '../composables/useMenuSelection.js';
-import { menuConfig } from '../config/menuConfig.js';
+import { computed, ref, watch } from "vue";
+import RadialInterface from "../components/RadialInterface.vue";
+import DynamicForm from "../components/DynamicForm.vue";
+import SelectionSummary from "../components/SelectionSummary.vue";
+import { useMenuSelection } from "../composables/useMenuSelection.js";
+import { menuConfig } from "../config/menuConfig.js";
 
 const {
   selectedSnack,
@@ -56,7 +56,7 @@ const {
   selectSnack,
   selectChef,
   selectMenuItem,
-  updateParameter
+  updateParameter,
 } = useMenuSelection();
 
 const radialSegments = ref([0, 0, 0]);
@@ -102,7 +102,7 @@ const onRadialSelectedSegmentsChange = (segments) => {
     selectChef(chef);
   }
 
-  const items = (chef?.menuItems || []);
+  const items = chef?.menuItems || [];
   const menuItem = items[menuIndex] || items[0];
   if (menuItem && menuItem.id !== selectedMenuItem.value?.id) {
     selectMenuItem(menuItem);
@@ -115,7 +115,9 @@ const goBack = () => {
 
 const goNext = () => {
   if (!selectedChef.value || !selectedMenuItem.value) {
-    alert("Please select a chef/media and menu item. / Bitte wählen Sie einen Koch/Media und Menüelement.");
+    alert(
+      "Please select a chef/media and menu item. / Bitte wählen Sie einen Koch/Media und Menüelement.",
+    );
     return;
   }
 

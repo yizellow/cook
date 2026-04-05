@@ -10,7 +10,6 @@ const answers = ref({
   question3: selectedChef.value?.question3?.default || 1,
 });
 
-
 const goBack = () => {
   window.location.hash = "#/chef-select";
 };
