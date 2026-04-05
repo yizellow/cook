@@ -2,48 +2,16 @@
 const name = localStorage.getItem("art_name") || "Not provided";
 const email = localStorage.getItem("art_email") || "Not provided";
 
-const selectedSnack = JSON.parse(localStorage.getItem("selectedSnack") || "null");
+const selectedSnack = JSON.parse(
+  localStorage.getItem("selectedSnack") || "null",
+);
 const selectedChef = JSON.parse(localStorage.getItem("selectedChef") || "null");
-const selectedMenuItem = JSON.parse(localStorage.getItem("selectedMenuItem") || "null");
-const parameterValues = JSON.parse(localStorage.getItem("parameterValues") || "{}");
-
-const submitOrder = () => {
-  // 建立訂單物件
-  const order = {
-    id: Date.now(),
-    customer: {
-      name,
-      email,
-    },
-    order: {
-      snack: selectedSnack,
-      chef: selectedChef,
-      menuItem: selectedMenuItem,
-      parameters: parameterValues,
-    },
-    createdAt: new Date().toLocaleString(),
-  };
-
-  // 從 localStorage 取得現有訂單
-  const existingOrders = JSON.parse(localStorage.getItem("art_orders")) || [];
-
-  // 添加新訂單
-  existingOrders.push(order);
-
-  // 保存回 localStorage
-  localStorage.setItem("art_orders", JSON.stringify(existingOrders));
-
-  // 清除當前訂單數據
-  localStorage.removeItem("art_name");
-  localStorage.removeItem("art_email");
-  localStorage.removeItem("selectedSnack");
-  localStorage.removeItem("selectedChef");
-  localStorage.removeItem("selectedMenuItem");
-  localStorage.removeItem("parameterValues");
-
-  alert("Order submitted successfully! / Bestellung erfolgreich eingereicht!");
-  window.location.hash = "#/orders";
-};
+const selectedMenuItem = JSON.parse(
+  localStorage.getItem("selectedMenuItem") || "null",
+);
+const parameterValues = JSON.parse(
+  localStorage.getItem("parameterValues") || "{}",
+);
 
 const goBack = () => {
   window.location.hash = "#/menu-wheel";
@@ -54,23 +22,86 @@ const goHome = () => {
 };
 
 const formatParameterValue = (param, value) => {
-  if (value === undefined || value === null) return 'Not set';
+  if (value === undefined || value === null) return "Not set";
 
   switch (param.type) {
-    case 'percentage':
+    case "percentage":
       return `${value}%`;
-    case 'range':
-      return value;
-    case 'spectrum':
+    case "range":
+      return String(value);
+    case "spectrum":
       return `${value}%`;
-    case 'boolean':
-      return value ? 'Yes' : 'No';
-    case 'single-choice':
-      return value;
-    case 'text':
-      return value || 'Not provided';
+    case "boolean":
+      return value ? "Yes" : "No";
+    case "single-choice":
+      return String(value);
+    case "text":
+      return value || "Not provided";
     default:
-      return value;
+      return String(value);
+  }
+};
+
+const submitOrder = async () => {
+  try {
+    if (!name || !email || !selectedChef || !selectedMenuItem) {
+      alert("Missing required order data");
+      return;
+    }
+
+    const parameters = (selectedMenuItem.parameters || []).map((param) => ({
+      id: param.id,
+      name: param.name,
+      type: param.type,
+      value: formatParameterValue(param, parameterValues[param.id]),
+    }));
+
+    const payload = {
+      customer: {
+        name,
+        email,
+      },
+      order: {
+        snackName: selectedSnack?.name || "",
+        chefId: selectedChef?.id || "",
+        chefName: selectedChef?.name || "",
+        menuItemId: selectedMenuItem?.id || "",
+        menuItemName: selectedMenuItem?.name || "",
+        parameters,
+      },
+      createdAt: new Date().toISOString(),
+    };
+
+    const res = await fetch("/api/create-order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error("Submit failed:", data);
+      alert(`Submit failed: ${data.error || "Unknown error"}`);
+      return;
+    }
+
+    localStorage.removeItem("art_name");
+    localStorage.removeItem("art_email");
+    localStorage.removeItem("selectedSnack");
+    localStorage.removeItem("selectedChef");
+    localStorage.removeItem("selectedMenuItem");
+    localStorage.removeItem("parameterValues");
+
+    alert(
+      "Order submitted successfully! / Bestellung erfolgreich eingereicht!",
+    );
+    window.location.hash = "#/orders";
+  } catch (error) {
+    console.error("Submit order error:", error);
+    alert("Failed to submit order");
   }
 };
 </script>
@@ -89,9 +120,11 @@ const formatParameterValue = (param, value) => {
 
       <div class="receipt-section">
         <h2>Order</h2>
-        <p><strong>Snack:</strong> {{ selectedSnack?.name || 'None' }}</p>
-        <p><strong>Chef:</strong> {{ selectedChef?.name || 'None' }}</p>
-        <p><strong>Menu Item:</strong> {{ selectedMenuItem?.name || 'None' }}</p>
+        <p><strong>Snack:</strong> {{ selectedSnack?.name || "None" }}</p>
+        <p><strong>Chef:</strong> {{ selectedChef?.name || "None" }}</p>
+        <p>
+          <strong>Menu Item:</strong> {{ selectedMenuItem?.name || "None" }}
+        </p>
       </div>
 
       <div class="receipt-section" v-if="selectedMenuItem">
@@ -102,7 +135,9 @@ const formatParameterValue = (param, value) => {
           class="parameter-item"
         >
           <strong>{{ param.name }}:</strong>
-          <span>{{ formatParameterValue(param, parameterValues[param.id]) }}</span>
+          <span>{{
+            formatParameterValue(param, parameterValues[param.id])
+          }}</span>
         </div>
       </div>
 
