@@ -23,14 +23,16 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { customer, order } = JSON.parse(event.body || "{}");
+    const body = JSON.parse(event.body || "{}");
+    const { customer, order, createdAt } = body;
 
     if (
       !customer?.name ||
       !customer?.email ||
       !order?.chefId ||
-      !order?.chefTitle ||
-      !order?.answers
+      !order?.chefName ||
+      !order?.menuItemId ||
+      !order?.menuItemName
     ) {
       return {
         statusCode: 400,
@@ -61,14 +63,14 @@ exports.handler = async (event) => {
         email: customer.email,
       },
       order: {
+        snackName: order.snackName || "",
         chefId: order.chefId,
-        chefTitle: order.chefTitle,
-        answers: {
-          question1: order.answers.question1 ?? "",
-          question2: order.answers.question2 ?? "",
-          question3: order.answers.question3 ?? "",
-        },
+        chefName: order.chefName,
+        menuItemId: order.menuItemId,
+        menuItemName: order.menuItemName,
+        parameters: Array.isArray(order.parameters) ? order.parameters : [],
       },
+      createdAt: createdAt || new Date().toISOString(),
     };
 
     const url = `https://${projectId}.api.sanity.io/v${apiVersion}/data/mutate/${dataset}`;
@@ -87,6 +89,7 @@ exports.handler = async (event) => {
     const sanityData = await sanityRes.json();
 
     if (!sanityRes.ok) {
+      console.error("Sanity error:", sanityData);
       return {
         statusCode: 500,
         headers,
