@@ -1,19 +1,18 @@
 <template>
   <section class="page menu-wheel-page">
     <div class="wheel-container">
+      <div class="title-section"></div>
       <h1 class="title">Choose Your Order</h1>
       <p class="subtitle">Select from the three layers</p>
 
       <div class="main-content">
         <!-- Left: Wheel Selector -->
-        <div class="wheel-section">
-          <RadialInterface
-            :layers="[menuConfig.snacks, menuConfig.chefs, availableMenuItems]"
-            :selectedSegments="radialSegments"
-            @update:selectedSegments="onRadialSelectedSegmentsChange"
-            :size="340"
-          />
-        </div>
+        <RadialInterface
+          :layers="[menuConfig.snacks, menuConfig.chefs, availableMenuItems]"
+          :selectedSegments="radialSegments"
+          @update:selectedSegments="onRadialSelectedSegmentsChange"
+          :size="340"
+        />
 
         <!-- Right: Dynamic Form -->
         <div class="form-section">
@@ -110,7 +109,7 @@ const onRadialSelectedSegmentsChange = (segments) => {
 };
 
 const goBack = () => {
-  window.location.hash = "#/menu";
+  window.location.hash = "#/";
 };
 
 const goNext = () => {
@@ -137,6 +136,11 @@ const goNext = () => {
 .wheel-container {
   max-width: 1200px;
   width: 100%;
+  height: 100%;
+  max-height: 1000px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .title {
@@ -154,19 +158,23 @@ const goNext = () => {
 .main-content {
   display: flex;
   gap: 2rem;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-}
+  position: relative;
+  height: 100%;
 
-.wheel-section {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
+  .wheel-section {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    height: 100%;
+  }
 
-.form-section {
-  flex: 1;
-  max-width: 400px;
+  .form-section {
+    flex: 1;
+    max-width: 400px;
+    height: 100%;
+  }
 }
 
 .nav-buttons {

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 
 const props = defineProps({
   layers: {
@@ -20,19 +20,19 @@ const props = defineProps({
   },
   midiEnabled: {
     type: Boolean,
-    default: false,
+    default: true,
   },
   midiChannels: {
     type: Array,
-    default: () => [0, 1, 2], // MIDI channels for [inner, middle, outer] circles
+    default: () => [0, 0, 0], // MIDI channels for [inner, middle, outer] circles
   },
   midiControlNumbers: {
     type: Array,
-    default: () => [10, 11, 12], // MIDI CC numbers for [inner, middle, outer] circles
+    default: () => [70, 71, 72], // MIDI CC numbers for [inner, middle, outer] circles
   },
 });
 
-const emit = defineEmits(['update:selectedSegments']);
+const emit = defineEmits(["update:selectedSegments"]);
 
 const selectedCircle = ref(null);
 const internalSelectedSegments = ref([...props.selectedSegments]);
@@ -51,11 +51,11 @@ watch(
       internalSelectedSegments.value = [...newSegments];
     }
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 );
 
 const emitSelectedSegments = (segments) => {
-  emit('update:selectedSegments', [...segments]);
+  emit("update:selectedSegments", [...segments]);
 };
 
 const handleCircleMouseEnter = (circleIndex) => {
@@ -134,7 +134,7 @@ const handleMidiMessage = (event) => {
 };
 
 onMounted(() => {
-  if (props.midiEnabled && typeof navigator.requestMIDIAccess === 'function') {
+  if (props.midiEnabled && typeof navigator.requestMIDIAccess === "function") {
     navigator.requestMIDIAccess().then(
       (midiAccess) => {
         const inputs = midiAccess.inputs.values();
@@ -147,14 +147,14 @@ onMounted(() => {
         }
       },
       (error) => {
-        console.error('MIDI access failed:', error);
-      }
+        console.error("MIDI access failed:", error);
+      },
     );
   }
 });
 
 onUnmounted(() => {
-  if (props.midiEnabled && typeof navigator.requestMIDIAccess === 'function') {
+  if (props.midiEnabled && typeof navigator.requestMIDIAccess === "function") {
     navigator.requestMIDIAccess().then((midiAccess) => {
       const inputs = midiAccess.inputs.values();
       for (
@@ -182,7 +182,8 @@ const getSegmentStyle = (segmentIndex, circleIndex) => {
   const y = Math.sin(angle) * radius + props.size / 2;
   const segmentSize = props.size * 0.12;
 
-  const isSelected = internalSelectedSegments.value[circleIndex] === segmentIndex;
+  const isSelected =
+    internalSelectedSegments.value[circleIndex] === segmentIndex;
   const isHoveredCircle = selectedCircle.value === circleIndex;
 
   return {
@@ -191,16 +192,16 @@ const getSegmentStyle = (segmentIndex, circleIndex) => {
     width: `${segmentSize}px`,
     height: `${segmentSize}px`,
     backgroundColor: isSelected
-      ? '#4CAF50'
+      ? "#4CAF50"
       : isHoveredCircle
-        ? '#8BC34A'
+        ? "#8BC34A"
         : circleIndex === 0
-          ? '#E0E0E0'
+          ? "#E0E0E0"
           : circleIndex === 1
-            ? '#BDBDBD'
-            : '#9E9E9E',
-    border: isSelected ? '3px solid #2E7D32' : 'none',
-    transform: isSelected ? 'scale(1.2)' : 'scale(1.0)',
+            ? "#BDBDBD"
+            : "#9E9E9E",
+    border: isSelected ? "3px solid #2E7D32" : "none",
+    transform: isSelected ? "scale(1.2)" : "scale(1.0)",
   };
 };
 
@@ -213,8 +214,8 @@ const getCircleStyle = (circleIndex) => {
     height: `${radius * 2}px`,
     left: `${props.size / 2 - radius}px`,
     top: `${props.size / 2 - radius}px`,
-    border: `4px solid ${isHovered ? '#FFC107' : circleIndex === 0 ? '#90CAF9' : circleIndex === 1 ? '#64B5F6' : '#42A5F5'}`,
-    backgroundColor: isHovered ? 'rgba(255, 193, 7, 0.1)' : 'transparent',
+    border: `4px solid ${isHovered ? "#FFC107" : circleIndex === 0 ? "#90CAF9" : circleIndex === 1 ? "#64B5F6" : "#42A5F5"}`,
+    backgroundColor: isHovered ? "rgba(255, 193, 7, 0.1)" : "transparent",
   };
 };
 

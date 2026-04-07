@@ -12,15 +12,15 @@ const props = defineProps({
   },
   midiEnabled: {
     type: Boolean,
-    default: false,
+    default: true,
   },
   midiChannels: {
     type: Array,
-    default: () => [0, 1, 2], // MIDI channels for [inner, middle, outer] circles
+    default: () => [0, 0, 0], // MIDI channels for [inner, middle, outer] circles
   },
   midiControlNumbers: {
     type: Array,
-    default: () => [10, 11, 12], // MIDI CC numbers for [inner, middle, outer] circles
+    default: () => [71, 72, 73], // MIDI CC numbers for [inner, middle, outer] circles
   },
 });
 
