@@ -46,7 +46,7 @@ const categories = computed(() => {
 });
 
 const goHome = () => {
-  window.location.hash = "#/";
+  window.location.hash = "/";
 };
 
 const getParameterList = (order) => {

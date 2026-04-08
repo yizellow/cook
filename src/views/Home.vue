@@ -1,90 +1,213 @@
-<script setup>
-import { ref } from "vue";
-import RadialInterface from "../components/RadialInterface.vue";
-
-const name = ref("");
-const email = ref("");
-
-const goNext = () => {
-  localStorage.setItem("art_name", name.value);
-  localStorage.setItem("art_email", email.value);
-
-  window.location.hash = "#/menu-wheel";
-};
-
-const goOrders = () => {
-  window.location.hash = "#/orders";
-};
-</script>
-
 <template>
-  <section class="page">
-    <div class="art-card">
-      <h1 class="title">Artwork Menu / Kunstwerk-Menü</h1>
-      <p class="subtitle">
-        Please enter your details. / Bitte geben Sie Ihre Daten ein.
-      </p>
+  <section class="page menu-wheel-page">
+    <div class="wheel-container">
+      <div class="title-section"></div>
+      <h1 class="title">Choose Your Order</h1>
+      <p class="subtitle">Select from the three layers</p>
 
-      <div class="form-group">
-        <label for="name">Name / Name</label>
-        <input
-          id="name"
-          v-model="name"
-          type="text"
-          placeholder="Enter your name / Geben Sie Ihren Namen ein"
+      <div class="main-content">
+        <!-- Left: Wheel Selector -->
+        <RadialInterface
+          :layers="[menuConfig.snacks, menuConfig.chefs, availableMenuItems]"
+          :selectedSegments="radialSegments"
+          @update:selectedSegments="onRadialSelectedSegmentsChange"
+          :size="340"
         />
+
+        <!-- Right: Dynamic Form -->
+        <div class="form-section">
+          <SelectionSummary
+            :selectedSnack="selectedSnack"
+            :selectedChef="selectedChef"
+            :selectedMenuItem="selectedMenuItem"
+          />
+          <DynamicForm
+            :parameters="currentParameters"
+            :values="parameterValues"
+            @update:parameter="updateParameter"
+          />
+        </div>
       </div>
 
-      <div class="form-group">
-        <label for="email">Email (optional) / E-Mail (optional)</label>
-        <input
-          id="email"
-          v-model="email"
-          type="email"
-          placeholder="Enter your email / Geben Sie Ihre E-Mail ein"
-        />
+      <div class="nav-buttons">
+        <button class="back-btn" @click="goBack">Back / Zurück</button>
+        <button class="next-btn" @click="goNext">Next / Weiter</button>
       </div>
-
-      <button class="main-btn" @click="goNext">Next / Weiter</button>
-      <button class="orders-btn" @click="goOrders">
-        View Orders / Bestellungen anzeigen
-      </button>
-    </div>
-
-    <!-- Radial Interface Component -->
-    <div class="radial-container">
-      <RadialInterface
-        :segmentCounts="[2, 6, 3]"
-        :size="250"
-        :midiEnabled="true"
-        :midiChannels="[0, 0, 0]"
-        :midiControlNumbers="[70, 71, 72]"
-      />
     </div>
   </section>
 </template>
 
-<style scoped lang="scss">
-.orders-btn {
-  display: block;
-  margin-top: 10px;
-  padding: 10px 20px;
-  background-color: #666;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
+<script setup>
+import { computed, ref, watch } from "vue";
+import RadialInterface from "../components/RadialInterface.vue";
+import DynamicForm from "../components/DynamicForm.vue";
+import SelectionSummary from "../components/SelectionSummary.vue";
+import { useMenuSelection } from "../composables/useMenuSelection.js";
+import { menuConfig } from "../config/menuConfig.js";
 
-  &:hover {
-    background-color: #444;
+const {
+  selectedSnack,
+  selectedChef,
+  selectedMenuItem,
+  parameterValues,
+  availableMenuItems,
+  currentParameters,
+  selectSnack,
+  selectChef,
+  selectMenuItem,
+  updateParameter,
+} = useMenuSelection();
+
+const radialSegments = ref([0, 0, 0]);
+
+const syncRadialSegments = () => {
+  const snackIndex = menuConfig.snacks.findIndex(
+    (snack) => snack.id === selectedSnack.value?.id,
+  );
+  const chefIndex = menuConfig.chefs.findIndex(
+    (chef) => chef.id === selectedChef.value?.id,
+  );
+  const menuIndex = availableMenuItems.value.findIndex(
+    (item) => item.id === selectedMenuItem.value?.id,
+  );
+
+  radialSegments.value = [
+    snackIndex >= 0 ? snackIndex : 0,
+    chefIndex >= 0 ? chefIndex : 0,
+    menuIndex >= 0 ? menuIndex : 0,
+  ];
+};
+
+syncRadialSegments();
+
+watch(
+  [selectedSnack, selectedChef, selectedMenuItem, availableMenuItems],
+  syncRadialSegments,
+  { deep: true },
+);
+
+const onRadialSelectedSegmentsChange = (segments) => {
+  if (!Array.isArray(segments)) return;
+
+  const [snackIndex, chefIndex, menuIndex] = segments;
+  const snack = menuConfig.snacks[snackIndex] || menuConfig.snacks[0];
+  const chef = menuConfig.chefs[chefIndex] || menuConfig.chefs[0];
+
+  if (snack && snack.id !== selectedSnack.value?.id) {
+    selectSnack(snack);
   }
-}
 
-.radial-container {
-  margin-top: 40px;
+  if (chef && chef.id !== selectedChef.value?.id) {
+    selectChef(chef);
+  }
+
+  const items = chef?.menuItems || [];
+  const menuItem = items[menuIndex] || items[0];
+  if (menuItem && menuItem.id !== selectedMenuItem.value?.id) {
+    selectMenuItem(menuItem);
+  }
+};
+
+const goBack = () => {
+  window.location.hash = "#/";
+};
+
+const goNext = () => {
+  if (!selectedChef.value || !selectedMenuItem.value) {
+    alert(
+      "Please select a chef/media and menu item. / Bitte wählen Sie einen Koch/Media und Menüelement.",
+    );
+    return;
+  }
+
+  window.location.hash = "#/receipt";
+};
+</script>
+
+<style scoped>
+.menu-wheel-page {
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.wheel-container {
+  max-width: 1200px;
+  width: 100%;
+  height: 100%;
+  max-height: 1000px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 0.5rem;
+  font-size: 2rem;
+}
+
+.subtitle {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #666;
+}
+
+.main-content {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 100%;
+
+  .wheel-section {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    height: 100%;
+  }
+
+  .form-section {
+    flex: 1;
+    max-width: 400px;
+    height: 100%;
+  }
+}
+
+.nav-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.back-btn,
+.next-btn {
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.back-btn {
+  background: #6c757d;
+  color: white;
+}
+
+.back-btn:hover {
+  background: #5a6268;
+}
+
+.next-btn {
+  background: #007bff;
+  color: white;
+}
+
+.next-btn:hover {
+  background: #0056b3;
 }
 </style>
