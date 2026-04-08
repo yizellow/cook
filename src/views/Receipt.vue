@@ -1,4 +1,6 @@
 <script setup>
+import SimpleWheel from "../components/SimpleWheel.vue";
+
 const name = localStorage.getItem("art_name") || "Not provided";
 const email = localStorage.getItem("art_email") || "Not provided";
 
@@ -149,5 +151,38 @@ const submitOrder = async () => {
         <button class="next-btn" @click="goHome">Home / Start</button>
       </div>
     </div>
+
+    <!-- Simple Wheel Component -->
+    <div class="wheel-container">
+      <SimpleWheel
+        :options="['Coffee', 'Tea', 'Water']"
+        :size="250"
+        :midiEnabled="true"
+        :midiChannel="0"
+        :midiControlNumber="70"
+      />
+    </div>
   </section>
 </template>
+
+<style scoped lang="scss">
+.page {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.art-card.receipt-page {
+  flex: 1;
+  min-width: 300px;
+}
+
+.wheel-container {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+</style>
