@@ -1,8 +1,12 @@
 <script setup>
+import { computed, ref } from "vue";
 import SimpleWheel from "../components/SimpleWheel.vue";
 
-const name = localStorage.getItem("art_name") || "Not provided";
-const email = localStorage.getItem("art_email") || "Not provided";
+const savedOrderCount = Number(localStorage.getItem("order_counter") || "0");
+const orderCode = String(savedOrderCount + 1).padStart(4, "0");
+const drinkOptions = ["Coffee", "Tea", "Water"];
+const selectedDrinkIndex = ref(0);
+const selectedDrink = computed(() => drinkOptions[selectedDrinkIndex.value]);
 
 const selectedSnack = JSON.parse(
   localStorage.getItem("selectedSnack") || "null",
@@ -46,7 +50,7 @@ const formatParameterValue = (param, value) => {
 
 const submitOrder = async () => {
   try {
-    if (!name || !email || !selectedChef || !selectedMenuItem) {
+    if (!selectedChef || !selectedMenuItem || !selectedDrink.value) {
       alert("Missing required order data");
       return;
     }
@@ -59,11 +63,9 @@ const submitOrder = async () => {
     }));
 
     const payload = {
-      customer: {
-        name,
-        email,
-      },
+      orderCode,
       order: {
+        drinkName: selectedDrink.value,
         snackName: selectedSnack?.name || "",
         chefId: selectedChef?.id || "",
         chefName: selectedChef?.name || "",
@@ -90,8 +92,7 @@ const submitOrder = async () => {
       return;
     }
 
-    localStorage.removeItem("art_name");
-    localStorage.removeItem("art_email");
+    localStorage.setItem("order_counter", String(savedOrderCount + 1));
     localStorage.removeItem("selectedSnack");
     localStorage.removeItem("selectedChef");
     localStorage.removeItem("selectedMenuItem");
@@ -115,13 +116,13 @@ const submitOrder = async () => {
       <p class="subtitle">Zusammenfassung / Summary</p>
 
       <div class="receipt-section">
-        <h2>User Info</h2>
-        <p><strong>Name:</strong> {{ name }}</p>
-        <p><strong>Email:</strong> {{ email }}</p>
+        <h2>Order Code</h2>
+        <p><strong>Code:</strong> {{ orderCode }}</p>
       </div>
 
       <div class="receipt-section">
         <h2>Order</h2>
+        <p><strong>Drink:</strong> {{ selectedDrink }}</p>
         <p><strong>Snack:</strong> {{ selectedSnack?.name || "None" }}</p>
         <p><strong>Chef:</strong> {{ selectedChef?.name || "None" }}</p>
         <p>
@@ -155,7 +156,9 @@ const submitOrder = async () => {
     <!-- Simple Wheel Component -->
     <div class="wheel-container">
       <SimpleWheel
-        :options="['Coffee', 'Tea', 'Water']"
+        :options="drinkOptions"
+        :selectedIndex="selectedDrinkIndex"
+        @update:selectedIndex="(index) => (selectedDrinkIndex.value = index)"
         :size="250"
         :midiEnabled="true"
         :midiChannel="0"
