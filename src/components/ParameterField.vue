@@ -43,11 +43,8 @@
 
     <!-- Boolean Toggle -->
     <div v-else-if="parameter.type === 'boolean'" class="boolean-group">
-      <button
-        :class="{ active: localValue }"
-        @click="localValue = !localValue"
-      >
-        {{ localValue ? 'Yes' : 'No' }}
+      <button :class="{ active: localValue }" @click="localValue = !localValue">
+        {{ localValue ? "Yes" : "No" }}
       </button>
     </div>
 
@@ -75,19 +72,22 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch } from "vue";
 
-const props = defineProps(['parameter', 'value']);
-const emit = defineEmits(['update:value']);
+const props = defineProps(["parameter", "value"]);
+const emit = defineEmits(["update:value"]);
 
 const localValue = ref(props.value);
 
-watch(() => props.value, (newVal) => {
-  localValue.value = newVal;
-});
+watch(
+  () => props.value,
+  (newVal) => {
+    localValue.value = newVal;
+  },
+);
 
 watch(localValue, (newVal) => {
-  emit('update:value', newVal);
+  emit("update:value", newVal);
 });
 </script>
 
@@ -104,9 +104,9 @@ watch(localValue, (newVal) => {
 
 .slider {
   width: 100%;
-  height: 6px;
+  height: 4px;
   border-radius: 3px;
-  background: #ddd;
+  background: var(--color-outline);
   outline: none;
   -webkit-appearance: none;
 }
@@ -116,7 +116,8 @@ watch(localValue, (newVal) => {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #007bff;
+  background: var(--color-blue);
+  border: 4px solid var(--color-outline);
   cursor: pointer;
 }
 
@@ -124,9 +125,9 @@ watch(localValue, (newVal) => {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #007bff;
+  background: var(--color-blue);
+  border: 4px solid var(--color-outline);
   cursor: pointer;
-  border: none;
 }
 
 .percentage-group,
@@ -146,22 +147,24 @@ watch(localValue, (newVal) => {
   color: #007bff;
 }
 
+button {
+  border: 4px solid var(--color-outline);
+  background: var(--color-blue);
+  font-weight: 800;
+
+  &.active {
+    background: var(--color-blue-highlight);
+  }
+
+  &:hover {
+    background: var(--color-blue-highlight);
+  }
+}
+
 .boolean-group button {
   padding: 0.5rem 1rem;
-  border: 2px solid #ddd;
-  background: white;
   border-radius: 8px;
   cursor: pointer;
-}
-
-.boolean-group button:hover {
-  border-color: #007bff;
-}
-
-.boolean-group button.active {
-  border-color: #007bff;
-  background: #f0f8ff;
-  color: #007bff;
 }
 
 .choice-group {
@@ -172,21 +175,9 @@ watch(localValue, (newVal) => {
 
 .choice-group button {
   padding: 0.75rem;
-  border: 2px solid #ddd;
-  background: white;
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;
-}
-
-.choice-group button:hover {
-  border-color: #007bff;
-}
-
-.choice-group button.active {
-  border-color: #007bff;
-  background: #f0f8ff;
-  color: #007bff;
 }
 
 .text-group input {
@@ -199,6 +190,6 @@ watch(localValue, (newVal) => {
 
 .text-group input:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: var(--color-blue);
 }
 </style>

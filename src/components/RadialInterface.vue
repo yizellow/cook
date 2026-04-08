@@ -170,15 +170,9 @@ const getSegmentStyle = (segmentIndex, circleIndex) => {
     width: `${segmentSize}px`,
     height: `${segmentSize}px`,
     backgroundColor: isSelected
-      ? "#4CAF50"
-      : isHoveredCircle
-        ? "#8BC34A"
-        : circleIndex === 0
-          ? "#E0E0E0"
-          : circleIndex === 1
-            ? "#BDBDBD"
-            : "#9E9E9E",
-    border: isSelected ? "3px solid #2E7D32" : "none",
+      ? "var(--accent-color-highlight)"
+      : "var(--accent-color)",
+    border: isSelected ? "3px solid var(--color-outline)" : "none",
     transform: isSelected ? "scale(1.2)" : "scale(1.0)",
   };
 };
@@ -200,8 +194,7 @@ const getCircleStyle = (circleIndex) => {
     height: `${radius * 2}px`,
     left: `${props.size / 2 - radius}px`,
     top: `${props.size / 2 - radius}px`,
-    border: `4px solid ${isHovered ? "#FFC107" : circleIndex === 0 ? "#90CAF9" : circleIndex === 1 ? "#64B5F6" : "#42A5F5"}`,
-    backgroundColor: isHovered ? "rgba(255, 193, 7, 0.1)" : "transparent",
+    // opacity: isHovered ? 0.4 : 1,
     transform: `rotate(-${segmentAnglePosition}deg)`,
   };
 };
@@ -233,6 +226,7 @@ const getCursorStyle = (circleIndex) => {
       v-for="circleIndex in [2, 1, 0]"
       :key="circleIndex"
       class="radial-circle"
+      :data-layer="circleIndex"
       :style="getCircleStyle(circleIndex)"
       @mouseenter="handleCircleMouseEnter(circleIndex)"
       @mouseleave="handleCircleMouseLeave"
@@ -267,10 +261,29 @@ const getCursorStyle = (circleIndex) => {
 }
 
 .radial-circle {
+  --accent-color: var(--color-blue);
+  --accent-color-highlight: var(--color-blue-highlight);
   position: absolute;
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.3s ease-out;
+
+  border: 10px solid var(--accent-color);
+
+  &[data-layer*="0"] {
+    --accent-color: var(--color-yellow);
+    --accent-color-highlight: var(--color-yellow-highlight);
+  }
+
+  &[data-layer*="1"] {
+    --accent-color: var(--color-pink);
+    --accent-color-highlight: var(--color-pink-highlight);
+  }
+
+  &[data-layer*="2"] {
+    --accent-color: var(--color-green);
+    --accent-color-highlight: var(--color-green-highlight);
+  }
 }
 
 .radial-segment {
