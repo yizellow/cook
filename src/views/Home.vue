@@ -6,15 +6,10 @@ const name = ref("");
 const email = ref("");
 
 const goNext = () => {
-  if (!name.value.trim()) {
-    alert("Please enter your name. / Bitte geben Sie Ihren Namen ein.");
-    return;
-  }
-
   localStorage.setItem("art_name", name.value);
   localStorage.setItem("art_email", email.value);
 
-  window.location.hash = "#/menu";
+  window.location.hash = "#/menu-wheel";
 };
 
 const goOrders = () => {

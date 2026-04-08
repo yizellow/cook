@@ -17,10 +17,10 @@ const routes = {
   "/orders": Orders,
 };
 
-const currentPath = ref(window.location.hash || "#/");
+const currentPath = ref(window.location.hash || "#/menu-wheel");
 
 window.addEventListener("hashchange", () => {
-  currentPath.value = window.location.hash || "#/";
+  currentPath.value = window.location.hash || "#/menu-wheel";
 });
 
 const currentView = computed(() => {
