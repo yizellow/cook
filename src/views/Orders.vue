@@ -116,8 +116,8 @@ const clearAllOrders = () => {
 
           <div class="orders-table">
             <div class="table-header">
-              <div class="col col-name">Name</div>
-              <div class="col col-email">Email</div>
+              <div class="col col-code">Order Code</div>
+              <div class="col col-drink">Drink</div>
               <div class="col col-snack">Snack</div>
               <div class="col col-chef">Chef</div>
               <div class="col col-item">Menu Item</div>
@@ -131,11 +131,11 @@ const clearAllOrders = () => {
               :key="order._id"
               class="table-row"
             >
-              <div class="col col-name">
-                {{ order.customer?.name || "Unknown" }}
+              <div class="col col-code">
+                {{ order.orderCode || "Unknown" }}
               </div>
-              <div class="col col-email">
-                {{ order.customer?.email || "Unknown" }}
+              <div class="col col-drink">
+                {{ order.order?.drinkName || "None" }}
               </div>
               <div class="col col-snack">
                 {{ order.order?.snackName || "None" }}

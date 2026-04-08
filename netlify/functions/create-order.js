@@ -24,11 +24,11 @@ exports.handler = async (event) => {
 
   try {
     const body = JSON.parse(event.body || "{}");
-    const { customer, order, createdAt } = body;
+    const { customer, orderCode, order, createdAt } = body;
 
     if (
-      !customer?.name ||
-      !customer?.email ||
+      !orderCode ||
+      !order?.drinkName ||
       !order?.chefId ||
       !order?.chefName ||
       !order?.menuItemId ||
@@ -58,11 +58,9 @@ exports.handler = async (event) => {
 
     const orderDocument = {
       _type: "order",
-      customer: {
-        name: customer.name,
-        email: customer.email,
-      },
+      orderCode,
       order: {
+        drinkName: order.drinkName,
         snackName: order.snackName || "",
         chefId: order.chefId,
         chefName: order.chefName,
@@ -72,6 +70,13 @@ exports.handler = async (event) => {
       },
       createdAt: createdAt || new Date().toISOString(),
     };
+
+    if (customer?.name || customer?.email) {
+      orderDocument.customer = {
+        name: customer?.name || "",
+        email: customer?.email || "",
+      };
+    }
 
     const url = `https://${projectId}.api.sanity.io/v${apiVersion}/data/mutate/${dataset}`;
 
