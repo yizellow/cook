@@ -1,5 +1,20 @@
-.page {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
+//test
+$primary-color: #42b983;
+
+@use "./colors.scss";
+@use "./layout.scss";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: var(--color-text);
+  margin-top: 60px;
+  background-color: var(--color-background);
+  margin: 0;
 }

@@ -1,6 +1,11 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
-import { mapMidiToAngle, setupMidiListener, parseMidiControlChange } from "../utils/midiUtils";
+import {
+  mapMidiToAngle,
+  setupMidiListener,
+  parseMidiControlChange,
+} from "../utils/midiUtils";
+import RadialLabel from "./RadialLabel.vue";
 
 const props = defineProps({
   layers: {
@@ -33,6 +38,7 @@ const props = defineProps({
   },
 });
 
+const circleWidth = computed(() => props.size / 3);
 const emit = defineEmits(["update:selectedSegments"]);
 
 const selectedCircle = ref(null);
@@ -42,6 +48,12 @@ const selectionAngles = ref([0, 0, 0]);
 const circleSegmentCounts = computed(() => {
   return props.layers.map((layer, index) => {
     return layer?.length || props.segmentCounts[index] || 8;
+  });
+});
+
+const circleRadiuses = computed(() => {
+  return props.layers.map((layer, index) => {
+    return props.size * (0.3 + index * 0.2);
   });
 });
 
@@ -80,7 +92,7 @@ const handleWheel = (e, circleIndex) => {
 
   const segmentCount = circleSegmentCounts.value[circleIndex];
   const segment =
-    Math.round((newAngle / (Math.PI * 2)) * segmentCount) % segmentCount;
+    Math.floor((newAngle / (Math.PI * 2)) * segmentCount) % segmentCount;
 
   const newSegments = [...internalSelectedSegments.value];
   newSegments[circleIndex] = segment;
@@ -145,12 +157,17 @@ const getSegmentLabel = (segmentIndex, circleIndex) => {
 };
 
 const getSegmentStyle = (segmentIndex, circleIndex) => {
-  const segmentCount = circleSegmentCounts.value[circleIndex];
-  const angle = segmentIndex * (360 / segmentCount) * (Math.PI / 180);
-  const radius = props.size * (0.3 + circleIndex * 0.2);
+  const positionOffset = circleWidth.value * 0.3;
+  const segmentAngleSize =
+    (2 * Math.PI) / circleSegmentCounts.value[circleIndex];
+  const segmentPositionAngle =
+    segmentIndex * segmentAngleSize - segmentAngleSize / 2;
+  const segmentRotationAngle = segmentPositionAngle + Math.PI / 2;
+  if (circleIndex == 1) console.log(segmentPositionAngle * (180 / Math.PI));
+  const radius = circleRadiuses.value[circleIndex] - positionOffset;
 
-  const x = Math.cos(angle) * radius + props.size / 2;
-  const y = Math.sin(angle) * radius + props.size / 2;
+  const x = Math.cos(segmentPositionAngle) * radius + radius + positionOffset;
+  const y = Math.sin(segmentPositionAngle) * radius + radius + positionOffset;
   const segmentSize = props.size * 0.12;
 
   const isSelected =
@@ -163,30 +180,33 @@ const getSegmentStyle = (segmentIndex, circleIndex) => {
     width: `${segmentSize}px`,
     height: `${segmentSize}px`,
     backgroundColor: isSelected
-      ? "#4CAF50"
-      : isHoveredCircle
-        ? "#8BC34A"
-        : circleIndex === 0
-          ? "#E0E0E0"
-          : circleIndex === 1
-            ? "#BDBDBD"
-            : "#9E9E9E",
-    border: isSelected ? "3px solid #2E7D32" : "none",
+      ? "var(--accent-color-highlight)"
+      : "var(--accent-color)",
+    border: "3px solid var(--color-outline)",
     transform: isSelected ? "scale(1.2)" : "scale(1.0)",
+    transform: `rotate(${segmentRotationAngle * (180 / Math.PI)}deg)`,
   };
 };
 
 const getCircleStyle = (circleIndex) => {
-  const radius = props.size * (0.3 + circleIndex * 0.2);
+  const radius = circleRadiuses.value[circleIndex];
   const isHovered = selectedCircle.value === circleIndex;
+
+  const segmentAngleSize =
+    (2 * Math.PI) / circleSegmentCounts.value[circleIndex];
+  const segmentAnglePosition =
+    (internalSelectedSegments.value[circleIndex] * segmentAngleSize -
+      segmentAngleSize / 2 +
+      Math.PI / 2) *
+    (180 / Math.PI);
 
   return {
     width: `${radius * 2}px`,
     height: `${radius * 2}px`,
     left: `${props.size / 2 - radius}px`,
     top: `${props.size / 2 - radius}px`,
-    border: `4px solid ${isHovered ? "#FFC107" : circleIndex === 0 ? "#90CAF9" : circleIndex === 1 ? "#64B5F6" : "#42A5F5"}`,
-    backgroundColor: isHovered ? "rgba(255, 193, 7, 0.1)" : "transparent",
+    // opacity: isHovered ? 0.4 : 1,
+    transform: `rotate(-${segmentAnglePosition}deg)`,
   };
 };
 
@@ -217,14 +237,14 @@ const getCursorStyle = (circleIndex) => {
       v-for="circleIndex in [2, 1, 0]"
       :key="circleIndex"
       class="radial-circle"
+      :data-layer="circleIndex"
       :style="getCircleStyle(circleIndex)"
       @mouseenter="handleCircleMouseEnter(circleIndex)"
       @mouseleave="handleCircleMouseLeave"
       @wheel="handleWheel($event, circleIndex)"
-    ></div>
-
-    <!-- Segments for each circle -->
-    <div v-for="circleIndex in [2, 1, 0]" :key="`segments-${circleIndex}`">
+    >
+      <div class="outer-circle"></div>
+      <div class="inner-circle"></div>
       <div
         v-for="segmentIndex in circleSegmentCounts[circleIndex]"
         :key="`${circleIndex}-${segmentIndex}`"
@@ -232,18 +252,19 @@ const getCursorStyle = (circleIndex) => {
         :style="getSegmentStyle(segmentIndex - 1, circleIndex)"
         @click.stop="selectSegment(circleIndex, segmentIndex - 1)"
       >
-        <div class="segment-label">
-          {{ getSegmentLabel(segmentIndex - 1, circleIndex) }}
-        </div>
+        <RadialLabel
+          :label="getSegmentLabel(segmentIndex - 1, circleIndex)"
+          :radius="circleRadiuses[circleIndex] - circleWidth * 0.3"
+        />
       </div>
     </div>
 
-    <!-- cursors for each circle -->
-    <div
+    <!-- cursors for each circle (for debugging) -->
+    <!-- <div
       v-for="circleIndex in [2, 1, 0]"
       class="radial-cursor"
       :style="getCursorStyle(circleIndex)"
-    ></div>
+    ></div> -->
   </div>
 </template>
 
@@ -254,25 +275,68 @@ const getCursorStyle = (circleIndex) => {
 }
 
 .radial-circle {
+  --circle-width: v-bind(circleWidth);
+  --accent-color: var(--color-blue);
+  --accent-color-highlight: var(--color-blue-highlight);
   position: absolute;
   border-radius: 50%;
   cursor: pointer;
-  transition: all 0.1s ease-out;
+  transition: all 0.3s ease-out;
+
+  /*border: 10px solid var(--accent-color);*/
+
+  &[data-layer*="0"] {
+    --accent-color: var(--color-yellow);
+    --accent-color-highlight: var(--color-yellow-highlight);
+  }
+
+  &[data-layer*="1"] {
+    --accent-color: var(--color-pink);
+    --accent-color-highlight: var(--color-pink-highlight);
+  }
+
+  &[data-layer*="2"] {
+    --accent-color: var(--color-green);
+    --accent-color-highlight: var(--color-green-highlight);
+  }
+
+  .inner-circle {
+    border: 4px solid var(--color-outline);
+    background-color: var(--color-background);
+    position: absolute;
+    width: calc(100% - var(--circle-width) * 1px);
+    height: calc(100% - var(--circle-width) * 1px);
+    top: calc(var(--circle-width) / 2 * 1px);
+    left: calc(var(--circle-width) / 2 * 1px);
+    border-radius: 50%;
+  }
+
+  .outer-circle {
+    border: 4px solid var(--color-outline);
+    background-color: var(--accent-color);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+  }
 }
 
 .radial-segment {
   position: absolute;
   border-radius: 50%;
   transition: all 0.1s ease-out;
-}
-
-.segment-label {
-  position: absolute;
-  width: 20px;
-  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.segment-label {
+  /*position: absolute;*/
+  /*width: 20px;*/
+  /*height: 20px;*/
+
   font-size: 12px;
   font-weight: bold;
   color: #333;
