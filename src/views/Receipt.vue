@@ -3,7 +3,7 @@ import { computed, ref } from "vue";
 import SimpleWheel from "../components/SimpleWheel.vue";
 
 const savedOrderCount = Number(localStorage.getItem("order_counter") || "0");
-const orderCode = `ORD-${String(savedOrderCount + 1).padStart(4, "0")}`;
+const orderCode = `${String(savedOrderCount + 1).padStart(3, "0")}`;
 
 const drinkOptions = ["Coffee", "Tea", "Water"];
 const selectedDrinkIndex = ref(0);

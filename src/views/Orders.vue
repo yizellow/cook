@@ -145,7 +145,12 @@ const deleteOrder = async (orderId) => {
 };
 
 const clearAllOrders = () => {
-  alert("Clear All is not connected to database yet.");
+  alert("Clear All is not connected to database yet. Order Co");
+};
+
+const resetOrderCount = () => {
+  localStorage.setItem("order_counter", 0);
+  alert("Order count was reset to 0.");
 };
 </script>
 
@@ -256,6 +261,13 @@ const clearAllOrders = () => {
           @click="clearAllOrders"
         >
           Clear All / Alles löschen
+        </button>
+        <button
+          v-if="orders.length > 0"
+          class="clear-btn"
+          @click="resetOrderCount"
+        >
+          Reset Order Counter
         </button>
       </div>
     </div>
