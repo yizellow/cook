@@ -59,52 +59,53 @@ const openPdf = (orderId) => {
   const order = orders.value.find((o) => o._id === orderId);
   if (!order) return;
 
-  const doc = new jsPDF();
+  const doc = new jsPDF({ unit: "mm", format: [57, 100] });
+  const yGap = 5;
 
   // Add title
-  doc.setFontSize(18);
+  doc.setFontSize(10);
   doc.text("Order Receipt", 15, 20);
 
   // Add order details
-  doc.setFontSize(12);
+  doc.setFontSize(6);
   let yPos = 30;
 
-  doc.text(`Order Code: ${order.orderCode || "Unknown"}`, 15, yPos);
-  yPos += 10;
+  doc.text(`Order Code: ${order.orderCode || "Unknown"}`, 5, yPos);
+  yPos += yGap;
 
-  doc.text(`Chef: ${order.order?.chefName || "Unknown Chef"}`, 15, yPos);
-  yPos += 10;
+  doc.text(`Chef: ${order.order?.chefName || "Unknown Chef"}`, 5, yPos);
+  yPos += yGap;
 
   doc.text(
     `Menu Item: ${order.order?.menuItemName || "Unknown Item"}`,
-    15,
+    5,
     yPos,
   );
-  yPos += 10;
+  yPos += yGap;
 
-  doc.text(`Drink: ${order.order?.drinkName || "None"}`, 15, yPos);
-  yPos += 10;
+  doc.text(`Drink: ${order.order?.drinkName || "None"}`, 5, yPos);
+  yPos += yGap;
 
-  doc.text(`Snack: ${order.order?.snackName || "None"}`, 15, yPos);
-  yPos += 10;
+  doc.text(`Snack: ${order.order?.snackName || "None"}`, 5, yPos);
+  yPos += yGap;
 
   // Add parameters if any
   if (order.order?.parameters && order.order.parameters.length > 0) {
     yPos += 5;
-    doc.text("Parameters:", 15, yPos);
-    yPos += 10;
+    doc.text("Parameters:", 5, yPos);
+    yPos += yGap;
 
     order.order.parameters.forEach((param) => {
-      doc.text(`${param.name}: ${param.value}`, 20, yPos);
-      yPos += 10;
+      doc.text(`${param.name}: ${param.value}`, 8, yPos);
+      yPos += yGap;
     });
   }
 
   // Add date
-  yPos += 10;
+  yPos += yGap;
   doc.text(
     `Created: ${order.createdAt ? new Date(order.createdAt).toLocaleString() : "Unknown"}`,
-    15,
+    5,
     yPos,
   );
 
@@ -210,7 +211,7 @@ const clearAllOrders = () => {
                     :key="param.id"
                     class="param-item"
                   >
-                    <strong>{{ param.name }}:</strong> {{ param.value }}
+                    <em>{{ param.name }}:</em> {{ param.value }}
                   </div>
                 </div>
                 <div class="drink">
@@ -333,22 +334,18 @@ const clearAllOrders = () => {
   text-overflow: ellipsis;
   font-size: 0.75rem;
   flex-grow: 1;
+  line-height: 1.8;
 
   &.col-props {
     display: flex;
     gap: 0.5rem 2rem;
-  }
 
-  &.col-date {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: unset;
-  }
-
-  &.col-params {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: unset;
+    .params {
+      strong {
+        display: block;
+        margin-bottom: 0.125rem;
+      }
+    }
   }
 
   &.col-action {
