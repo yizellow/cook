@@ -44,6 +44,30 @@ const emit = defineEmits(["update:selectedSegments"]);
 const selectedCircle = ref(null);
 const internalSelectedSegments = ref([...props.selectedSegments]);
 const selectionAngles = ref([0, 0, 0]);
+const transformsEnabled = ref(false);
+const labelReadyCount = ref(0);
+const totalLabels = ref(0);
+
+const handleLabelReady = () => {
+  labelReadyCount.value++;
+  // Enable transforms when all labels are ready
+  if (labelReadyCount.value >= totalLabels.value) {
+    transformsEnabled.value = true;
+  }
+};
+
+// Calculate total labels initially
+onMounted(() => {
+  totalLabels.value = props.layers.reduce(
+    (sum, layer) => sum + (layer?.length || 0),
+    0
+  );
+  
+  // If no labels, enable transforms immediately
+  if (totalLabels.value === 0) {
+    transformsEnabled.value = true;
+  }
+});
 
 const circleSegmentCounts = computed(() => {
   return props.layers.map((layer, index) => {
@@ -163,7 +187,6 @@ const getSegmentStyle = (segmentIndex, circleIndex) => {
   const segmentPositionAngle =
     segmentIndex * segmentAngleSize - segmentAngleSize / 2;
   const segmentRotationAngle = segmentPositionAngle + Math.PI / 2;
-  if (circleIndex == 1) console.log(segmentPositionAngle * (180 / Math.PI));
   const radius = circleRadiuses.value[circleIndex] - positionOffset;
 
   const x = Math.cos(segmentPositionAngle) * radius + radius + positionOffset;
@@ -174,6 +197,10 @@ const getSegmentStyle = (segmentIndex, circleIndex) => {
     internalSelectedSegments.value[circleIndex] === segmentIndex;
   const isHoveredCircle = selectedCircle.value === circleIndex;
 
+  const transformValue = transformsEnabled.value
+    ? `rotate(${segmentRotationAngle * (180 / Math.PI)}deg)`
+    : "none";
+
   return {
     left: `${x - segmentSize / 2}px`,
     top: `${y - segmentSize / 2}px`,
@@ -183,8 +210,7 @@ const getSegmentStyle = (segmentIndex, circleIndex) => {
       ? "var(--accent-color-highlight)"
       : "var(--accent-color)",
     border: "3px solid var(--color-outline)",
-    transform: isSelected ? "scale(1.2)" : "scale(1.0)",
-    transform: `rotate(${segmentRotationAngle * (180 / Math.PI)}deg)`,
+    transform: transformValue,
   };
 };
 
@@ -200,13 +226,17 @@ const getCircleStyle = (circleIndex) => {
       Math.PI / 2) *
     (180 / Math.PI);
 
+  const transformValue = transformsEnabled.value
+    ? `rotate(-${segmentAnglePosition}deg)`
+    : "none";
+
   return {
     width: `${radius * 2}px`,
     height: `${radius * 2}px`,
     left: `${props.size / 2 - radius}px`,
     top: `${props.size / 2 - radius}px`,
     // opacity: isHovered ? 0.4 : 1,
-    transform: `rotate(-${segmentAnglePosition}deg)`,
+    transform: transformValue,
   };
 };
 
@@ -255,6 +285,7 @@ const getCursorStyle = (circleIndex) => {
         <RadialLabel
           :label="getSegmentLabel(segmentIndex - 1, circleIndex)"
           :radius="circleRadiuses[circleIndex] - circleWidth * 0.3"
+          @circletype-ready="handleLabelReady"
         />
       </div>
     </div>

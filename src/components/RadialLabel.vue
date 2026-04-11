@@ -1,5 +1,5 @@
 <script setup>
-import { useTemplateRef, onMounted } from "vue";
+import { useTemplateRef, onMounted, defineEmits } from "vue";
 import CircleType from "circletype";
 
 const props = defineProps({
@@ -13,11 +13,16 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(["circletype-ready"]);
 const label = useTemplateRef("label");
 
 onMounted(() => {
-  const circleType = new CircleType(label.value);
-  circleType.radius(props.radius).dir(1);
+  if (label.value) {
+    const circleType = new CircleType(label.value);
+    circleType.radius(props.radius).dir(1);
+    // Notify parent that CircleType is ready
+    emit("circletype-ready");
+  }
 });
 </script>
 
@@ -26,3 +31,10 @@ onMounted(() => {
     {{ props.label }}
   </span>
 </template>
+
+<style scoped>
+.segment-label {
+  display: inline-block;
+  position: relative;
+}
+</style>
