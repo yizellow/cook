@@ -6,6 +6,11 @@ import {
   parseMidiControlChange,
 } from "../utils/midiUtils";
 import RadialLayer from "./RadialLayer.vue";
+import InnerRing from "./rings/InnerRing.vue";
+import MiddleRing from "./rings/MiddleRing.vue";
+import OuterRing2 from "./rings/OuterRing2.vue";
+import OuterRing3 from "./rings/OuterRing3.vue";
+import OuterRing4 from "./rings/OuterRing4.vue";
 
 const props = defineProps({
   layers: {
@@ -38,7 +43,13 @@ const props = defineProps({
   },
 });
 
-const circleWidth = computed(() => props.size / 3);
+const rings = [
+  Array(3).fill(InnerRing),
+  Array(3).fill(MiddleRing),
+  [OuterRing2, OuterRing3, OuterRing4],
+];
+
+const circleWidth = computed(() => props.size * 0.15);
 const emit = defineEmits(["update:selectedSegments"]);
 
 const selectedCircle = ref(null);
@@ -46,8 +57,12 @@ const internalSelectedSegments = ref([...props.selectedSegments]);
 
 const circleRadiuses = computed(() => {
   return props.layers.map((layer, index) => {
-    return props.size * (0.3 + index * 0.2);
+    return (props.size * (0.333 + index * 0.333)) / 2;
   });
+});
+
+const segmentCounts = computed(() => {
+  return props.layers.map((layer) => layer.length);
 });
 
 watch(
@@ -78,11 +93,6 @@ const handleSegmentSelected = (event) => {
   newSegments[layerIndex] = segmentIndex;
   internalSelectedSegments.value = newSegments;
   emitSelectedSegments(newSegments);
-};
-
-const wrapAngle = (angle) => {
-  const wrapped = angle % (Math.PI * 2);
-  return wrapped < 0 ? wrapped + Math.PI * 2 : wrapped;
 };
 
 const handleMidiMessage = (event) => {
@@ -136,7 +146,6 @@ onUnmounted(() => {
       :key="`layer-${circleIndex}-${JSON.stringify(props.layers[circleIndex])}`"
       :layer-index="circleIndex"
       :segments="props.layers[circleIndex]"
-      :segment-count="props.segmentCounts[circleIndex] || 8"
       :size="props.size"
       :selected-segment="internalSelectedSegments[circleIndex]"
       :is-selected-circle="selectedCircle === circleIndex"
@@ -145,7 +154,11 @@ onUnmounted(() => {
       @mouseenter="handleCircleMouseEnter(circleIndex)"
       @mouseleave="handleCircleMouseLeave"
       @segment-selected="handleSegmentSelected"
-    />
+    >
+      <component
+        :is="rings[circleIndex][segmentCounts[circleIndex] - 2]"
+      ></component>
+    </RadialLayer>
   </div>
 </template>
 

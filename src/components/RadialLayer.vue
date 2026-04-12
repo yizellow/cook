@@ -60,7 +60,7 @@ const getSegmentLabel = (segmentIndex) => {
 };
 
 const getSegmentStyle = (segmentIndex) => {
-  const positionOffset = props.circleWidth * 0.3;
+  const positionOffset = props.circleWidth / 2;
   const segmentAngleSize = (2 * Math.PI) / circleSegmentCounts.value;
   const segmentPositionAngle =
     segmentIndex * segmentAngleSize - segmentAngleSize / 2;
@@ -69,7 +69,7 @@ const getSegmentStyle = (segmentIndex) => {
 
   const x = Math.cos(segmentPositionAngle) * radius + radius + positionOffset;
   const y = Math.sin(segmentPositionAngle) * radius + radius + positionOffset;
-  const segmentSize = props.size * 0.12;
+  const segmentSize = props.circleWidth / 2;
 
   const isSelected = props.selectedSegment === segmentIndex;
 
@@ -82,9 +82,9 @@ const getSegmentStyle = (segmentIndex) => {
     top: `${y - segmentSize / 2}px`,
     width: `${segmentSize}px`,
     height: `${segmentSize}px`,
-    backgroundColor: isSelected
-      ? "var(--accent-color-highlight)"
-      : "var(--accent-color)",
+    // backgroundColor: isSelected
+    //   ? "var(--accent-color-highlight)"
+    //   : "var(--accent-color)",
     transform: transformValue,
   };
 };
@@ -143,8 +143,7 @@ const handleWheel = (e) => {
     @mouseleave="$emit('mouseleave')"
     @wheel="handleWheel"
   >
-    <div class="outer-circle"></div>
-    <div class="inner-circle"></div>
+    <slot></slot>
     <div
       v-for="segmentIndex in circleSegmentCounts"
       :key="segmentIndex"
@@ -154,7 +153,7 @@ const handleWheel = (e) => {
     >
       <RadialLabel
         :label="getSegmentLabel(segmentIndex - 1)"
-        :radius="radius - circleWidth * 0.3"
+        :radius="radius - circleWidth / 2"
         @circletype-ready="handleLabelReady"
       />
     </div>
@@ -170,27 +169,13 @@ const handleWheel = (e) => {
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.3s ease-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  .inner-circle {
-    border: 4px solid var(--color-outline);
-    background-color: var(--color-background);
-    position: absolute;
-    width: calc(100% - var(--circle-width) * 1px);
-    height: calc(100% - var(--circle-width) * 1px);
-    top: calc(var(--circle-width) / 2 * 1px);
-    left: calc(var(--circle-width) / 2 * 1px);
-    border-radius: 50%;
-  }
-
-  .outer-circle {
-    border: 4px solid var(--color-outline);
-    background-color: var(--accent-color);
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    border-radius: 50%;
+  svg {
+    display: block;
+    user-select: none;
   }
 }
 
