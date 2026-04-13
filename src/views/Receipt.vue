@@ -108,7 +108,7 @@ const submitOrder = async () => {
     localStorage.removeItem("parameterValues");
 
     alert("Order submitted successfully!");
-    window.location.hash = "#/orders";
+    window.location.hash = "#/menu-wheel";
   } catch (error) {
     console.error("Submit order error:", error);
     alert("Failed to submit order");
@@ -117,37 +117,56 @@ const submitOrder = async () => {
 </script>
 
 <template>
-  <section class="page">
-    <div class="art-card receipt-page">
-      <h1 class="title">Receipt</h1>
-      <p class="subtitle">Zusammenfassung / Summary</p>
-
-      <div class="receipt-section">
-        <h2>Order Code</h2>
-        <p><strong>Code:</strong> {{ orderCode }}</p>
+  <section class="page menu-page">
+    <div class="content-container">
+      <div class="title-section">
+        <h1 class="title">Order Review</h1>
+        <!-- <p class="subtitle">Select from the three layers</p> -->
       </div>
+      <div class="main-content">
+        <div class="order-summary">
+          <div class="receipt-section">
+            <h2>Order Code</h2>
+            <p><strong>Code:</strong> {{ orderCode }}</p>
+          </div>
 
-      <div class="receipt-section">
-        <h2>Order</h2>
-        <p><strong>Drink:</strong> {{ selectedDrink }}</p>
-        <p><strong>Snack:</strong> {{ selectedSnack?.name || "None" }}</p>
-        <p><strong>Chef:</strong> {{ selectedChef?.name || "None" }}</p>
-        <p>
-          <strong>Menu Item:</strong> {{ selectedMenuItem?.name || "None" }}
-        </p>
-      </div>
+          <div class="receipt-section">
+            <h2>Order</h2>
+            <p><strong>Drink:</strong> {{ selectedDrink }}</p>
+            <p><strong>Snack:</strong> {{ selectedSnack?.name || "None" }}</p>
+            <p><strong>Chef:</strong> {{ selectedChef?.name || "None" }}</p>
+            <p>
+              <strong>Menu Item:</strong> {{ selectedMenuItem?.name || "None" }}
+            </p>
+          </div>
 
-      <div class="receipt-section" v-if="selectedMenuItem">
-        <h2>Parameters</h2>
-        <div
-          v-for="param in selectedMenuItem?.parameters || []"
-          :key="param.id"
-          class="parameter-item"
-        >
-          <strong>{{ param.name }}:</strong>
-          <span>{{
-            formatParameterValue(param, parameterValues[param.id])
-          }}</span>
+          <div class="receipt-section" v-if="selectedMenuItem">
+            <h2>Parameters</h2>
+            <div
+              v-for="param in selectedMenuItem?.parameters || []"
+              :key="param.id"
+              class="parameter-item"
+            >
+              <strong>{{ param.name }}:</strong>
+              <span>{{
+                formatParameterValue(param, parameterValues[param.id])
+              }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="wheel-container">
+          <SimpleWheel
+            :options="drinkOptions"
+            :selectedIndex="selectedDrinkIndex"
+            @update:selectedIndex="
+              (index) => (selectedDrinkIndex.value = index)
+            "
+            :size="250"
+            :midiEnabled="true"
+            :midiChannel="0"
+            :midiControlNumber="70"
+          />
         </div>
       </div>
 
@@ -166,34 +185,11 @@ const submitOrder = async () => {
         />
       </div>
     </div>
-
-    <div class="wheel-container">
-      <SimpleWheel
-        :options="drinkOptions"
-        :selectedIndex="selectedDrinkIndex"
-        @update:selectedIndex="(index) => (selectedDrinkIndex.value = index)"
-        :size="250"
-        :midiEnabled="true"
-        :midiChannel="0"
-        :midiControlNumber="70"
-      />
-    </div>
   </section>
 </template>
 
 <style scoped lang="scss">
-.page {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 40px;
-  flex-wrap: wrap;
-}
-
-.art-card.receipt-page {
-  flex: 1;
-  min-width: 300px;
-}
+@use "../styles/menuPage.scss";
 
 .wheel-container {
   flex-shrink: 0;

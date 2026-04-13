@@ -169,12 +169,12 @@ button {
 
 .choice-group {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
   gap: 0.5rem;
 }
 
 .choice-group button {
-  padding: 0.75rem;
+  padding: 0.5rem 1rem;
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;

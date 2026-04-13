@@ -163,7 +163,7 @@ onUnmounted(() => {
 <style scoped>
 .radial-interface {
   position: relative;
-  margin: 20px auto;
+  margin: 2rem;
 }
 
 .radial-circle {

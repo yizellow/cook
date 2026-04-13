@@ -2,8 +2,8 @@
 export const menuConfig = {
   // Layer 1: Snacks (independent state, doesn't affect right panel)
   snacks: [
-    { id: "menu", name: "Menu", description: "Standard menu flow" },
-    { id: "snack", name: "Snack", description: "Quick snack option" },
+    { id: "menu", name: "small", description: "Standard menu flow" },
+    { id: "snack", name: "large", description: "Quick snack option" },
   ],
 
   // Layer 2: Chefs/Media (determines menuItems and right panel scope)
@@ -226,7 +226,7 @@ export const menuConfig = {
     },
     {
       id: "website",
-      name: "Website",
+      name: "bits and bites",
       menuItems: [
         {
           id: "game",
@@ -321,13 +321,13 @@ export const menuConfig = {
               options: ["Event", "Product"],
               default: "Product",
             },
-            {
-              id: "description",
-              name: "Description",
-              type: "text",
-              placeholder: "Tell the artist what you want to advertise",
-              default: "",
-            },
+            // {
+            //   id: "description",
+            //   name: "Description",
+            //   type: "text",
+            //   placeholder: "Tell the artist what you want to advertise",
+            //   default: "",
+            // },
           ],
         },
       ],

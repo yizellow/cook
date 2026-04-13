@@ -82,7 +82,7 @@ onUnmounted(() => {
 <style scoped>
 .app-button {
   position: relative;
-  padding: 12px 24px;
+  padding: 0.25rem 0.5rem;
   border: 4px solid var(--color-outline);
   border-radius: 8px;
   font-size: 1rem;
@@ -92,8 +92,8 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-width: 120px;
+  gap: 0.5rem;
+  min-width: 6rem;
   color: var(--color-text);
 }
 

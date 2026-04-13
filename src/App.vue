@@ -9,7 +9,7 @@ import Orders from "./views/Orders.vue";
 import NotFound from "./views/NotFound.vue";
 
 const routes = {
-  "/": Home,
+  "/": MenuWheel,
   "/menu": Menu,
   "/menu-wheel": MenuWheel,
   "/chef-detail": ChefDetail,

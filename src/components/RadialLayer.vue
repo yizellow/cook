@@ -139,8 +139,6 @@ const handleWheel = (e) => {
     class="radial-circle"
     :data-layer="layerIndex"
     :style="getCircleStyle()"
-    @mouseenter="$emit('mouseenter', layerIndex)"
-    @mouseleave="$emit('mouseleave')"
     @wheel="handleWheel"
   >
     <slot></slot>
