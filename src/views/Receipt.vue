@@ -1,6 +1,8 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import SimpleWheel from "../components/SimpleWheel.vue";
+import PdfViewerSimple from "../components/PdfViewerSimple.vue";
+import { generateReceiptPdf, getPdfAsUint8Array } from "../utils/pdfUtils";
 
 const savedOrderCount = Number(localStorage.getItem("order_counter") || "0");
 const orderCode = `ORD-${String(savedOrderCount + 1).padStart(4, "0")}`;
@@ -19,6 +21,43 @@ const selectedMenuItem = JSON.parse(
 const parameterValues = JSON.parse(
   localStorage.getItem("parameterValues") || "{}",
 );
+
+const pdfData = ref(null);
+const isPdfLoading = ref(true);
+const pdfError = ref(null);
+
+const loadPdf = async () => {
+  try {
+    isPdfLoading.value = true;
+    pdfError.value = null;
+    
+    console.log('Generating PDF...');
+    const doc = generateReceiptPdf(
+      orderCode,
+      selectedDrink.value,
+      selectedSnack,
+      selectedChef,
+      selectedMenuItem,
+      parameterValues,
+    );
+    
+    console.log('Getting PDF as Uint8Array...');
+    const uint8Array = getPdfAsUint8Array(doc);
+    console.log('PDF data length:', uint8Array?.length);
+    
+    pdfData.value = uint8Array;
+    
+  } catch (error) {
+    console.error('Failed to load PDF:', error);
+    pdfError.value = 'Failed to generate PDF preview: ' + (error.message || String(error));
+  } finally {
+    isPdfLoading.value = false;
+  }
+};
+
+onMounted(() => {
+  loadPdf();
+});
 
 const goBack = () => {
   window.location.hash = "#/menu-wheel";
@@ -122,32 +161,22 @@ const submitOrder = async () => {
       <p class="subtitle">Zusammenfassung / Summary</p>
 
       <div class="receipt-section">
-        <h2>Order Code</h2>
-        <p><strong>Code:</strong> {{ orderCode }}</p>
-      </div>
-
-      <div class="receipt-section">
-        <h2>Order</h2>
-        <p><strong>Drink:</strong> {{ selectedDrink }}</p>
-        <p><strong>Snack:</strong> {{ selectedSnack?.name || "None" }}</p>
-        <p><strong>Chef:</strong> {{ selectedChef?.name || "None" }}</p>
-        <p>
-          <strong>Menu Item:</strong> {{ selectedMenuItem?.name || "None" }}
-        </p>
-      </div>
-
-      <div class="receipt-section" v-if="selectedMenuItem">
-        <h2>Parameters</h2>
-        <div
-          v-for="param in selectedMenuItem?.parameters || []"
-          :key="param.id"
-          class="parameter-item"
-        >
-          <strong>{{ param.name }}:</strong>
-          <span>{{
-            formatParameterValue(param, parameterValues[param.id])
-          }}</span>
+        <h2>Order Receipt Preview</h2>
+        <div class="pdf-preview">
+          <div v-if="isPdfLoading" class="pdf-loading">
+            Generating PDF preview...
+          </div>
+          
+          <div v-else-if="pdfError" class="pdf-error">
+            {{ pdfError }}
+          </div>
+          
+          <PdfViewerSimple v-else :pdf-data="pdfData" />
         </div>
+        <p class="pdf-note">
+          This is a preview of your order receipt. The final receipt will be
+          generated when you submit your order.
+        </p>
       </div>
 
       <div class="nav-buttons">
@@ -192,5 +221,42 @@ const submitOrder = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.receipt-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.pdf-preview {
+  margin: 15px 0;
+  width: 100%;
+  max-width: 500px; /* Give a bit more space for the canvas renderer */
+}
+
+.pdf-loading, .pdf-error {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pdf-error {
+  color: #d32f2f;
+  background-color: #ffebee;
+}
+
+.pdf-note {
+  font-size: 0.85em;
+  color: #666;
+  font-style: italic;
+  margin-top: 10px;
 }
 </style>

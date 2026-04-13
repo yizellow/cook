@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
+import { generateOrderPdf, openPdfInNewTab } from "../utils/pdfUtils";
 
 const orders = ref([]);
 const isLoading = ref(true);
@@ -52,6 +53,14 @@ const goHome = () => {
 const getParameterList = (order) => {
   const parameters = order.order?.parameters || [];
   return Array.isArray(parameters) ? parameters : [];
+};
+
+const openPdf = (orderId) => {
+  const order = orders.value.find((o) => o._id === orderId);
+  if (!order) return;
+
+  const doc = generateOrderPdf(order);
+  openPdfInNewTab(doc, orderId);
 };
 
 const deleteOrder = async (orderId) => {
