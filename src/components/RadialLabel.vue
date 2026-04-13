@@ -36,5 +36,7 @@ onMounted(() => {
 .segment-label {
   display: inline-block;
   position: relative;
+  text-transform: uppercase;
+  font-weight: 600;
 }
 </style>

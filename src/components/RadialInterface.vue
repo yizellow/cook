@@ -157,6 +157,7 @@ onUnmounted(() => {
     >
       <component
         :is="rings[circleIndex][segmentCounts[circleIndex] - 2]"
+        :selected-segment="internalSelectedSegments[circleIndex]"
       ></component>
     </RadialLayer>
   </div>

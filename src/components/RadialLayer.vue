@@ -167,7 +167,7 @@ const handleWheel = (e) => {
   --accent-color-highlight: var(--color-blue-highlight);
   position: absolute;
   border-radius: 50%;
-  cursor: pointer;
+  /*cursor: pointer;*/
   transition: all 0.3s ease-out;
   display: flex;
   justify-content: center;
@@ -186,6 +186,7 @@ const handleWheel = (e) => {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
   /*border: 3px solid var(--color-outline);*/
 }
 </style>
