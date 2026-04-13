@@ -30,8 +30,12 @@
       </div>
 
       <div class="nav-buttons">
-        <button class="back-btn" @click="goBack">Back / Zurück</button>
-        <button class="next-btn" @click="goNext">Next / Weiter</button>
+        <ActionButton
+          text="Next"
+          type="secondary"
+          shortcutKey="ArrowRight"
+          @click="goNext"
+        />
       </div>
     </div>
   </section>
@@ -42,6 +46,7 @@ import { computed, ref, watch } from "vue";
 import RadialInterface from "../components/RadialInterface.vue";
 import DynamicForm from "../components/DynamicForm.vue";
 import SelectionSummary from "../components/SelectionSummary.vue";
+import ActionButton from "../components/ActionButton.vue";
 import { useMenuSelection } from "../composables/useMenuSelection.js";
 import { menuConfig } from "../config/menuConfig.js";
 
@@ -106,10 +111,6 @@ const onRadialSelectedSegmentsChange = (segments) => {
   if (menuItem && menuItem.id !== selectedMenuItem.value?.id) {
     selectMenuItem(menuItem);
   }
-};
-
-const goBack = () => {
-  window.location.hash = "#/";
 };
 
 const goNext = () => {

@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import SimpleWheel from "../components/SimpleWheel.vue";
+import ActionButton from "../components/ActionButton.vue";
 
 const savedOrderCount = Number(localStorage.getItem("order_counter") || "0");
 const orderCode = `${String(savedOrderCount + 1).padStart(3, "0")}`;
@@ -151,11 +152,18 @@ const submitOrder = async () => {
       </div>
 
       <div class="nav-buttons">
-        <button class="back-btn" @click="goBack">Back / Zurück</button>
-        <button class="submit-btn" @click="submitOrder">
-          Submit Order / Bestellung einreichen
-        </button>
-        <button class="next-btn" @click="goHome">Home / Start</button>
+        <ActionButton
+          text="Back"
+          type="back"
+          shortcutKey="ArrowLeft"
+          @click="goBack"
+        />
+        <ActionButton
+          text="Submit"
+          type="primary"
+          shortcutKey="ArrowRight"
+          @click="submitOrder"
+        />
       </div>
     </div>
 
