@@ -60,7 +60,7 @@ const getSegmentLabel = (segmentIndex) => {
 };
 
 const getSegmentStyle = (segmentIndex) => {
-  const positionOffset = props.circleWidth / 2;
+  const positionOffset = props.circleWidth / 2 + 3;
   const segmentAngleSize = (2 * Math.PI) / circleSegmentCounts.value;
   const segmentPositionAngle =
     segmentIndex * segmentAngleSize - segmentAngleSize / 2;
@@ -148,6 +148,7 @@ const handleWheel = (e) => {
       v-for="segmentIndex in circleSegmentCounts"
       :key="segmentIndex"
       class="radial-segment"
+      :class="{ selected: selectedSegment == segmentIndex - 1 }"
       :style="getSegmentStyle(segmentIndex - 1)"
       @click.stop="selectSegment(segmentIndex - 1)"
     >
@@ -188,5 +189,11 @@ const handleWheel = (e) => {
   justify-content: center;
   cursor: pointer;
   /*border: 3px solid var(--color-outline);*/
+
+  &.selected {
+    .segment-label {
+      color: var(--color-text);
+    }
+  }
 }
 </style>

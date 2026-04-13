@@ -104,17 +104,14 @@ const handleMidiMessage = (event) => {
       props.midiChannels[circleIndex] === midiData.channel &&
       props.midiControlNumbers[circleIndex] === midiData.controlNumber
     ) {
-      const newAngle = mapMidiToAngle(midiData.value);
-      selectionAngles.value[circleIndex] = newAngle;
-
-      const segmentCount = circleSegmentCounts.value[circleIndex];
+      const angle = mapMidiToAngle(midiData.value);
+      const segmentCount = segmentCounts.value[circleIndex];
       const segment =
-        Math.floor((newAngle / (Math.PI * 2)) * segmentCount) % segmentCount;
+        Math.floor((angle / (Math.PI * 2)) * segmentCount) % segmentCount;
       const newSegments = [...internalSelectedSegments.value];
       newSegments[circleIndex] = segment;
       internalSelectedSegments.value = newSegments;
       emitSelectedSegments(newSegments);
-
       break;
     }
   }

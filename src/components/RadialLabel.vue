@@ -35,8 +35,10 @@ onMounted(() => {
 <style scoped>
 .segment-label {
   display: inline-block;
+  height: 1rem;
   position: relative;
   text-transform: uppercase;
   font-weight: 600;
+  color: var(--color-text-faded);
 }
 </style>
