@@ -1,6 +1,7 @@
 //test
 $primary-color: #42b983;
 
+@use "./fonts.scss";
 @use "./colors.scss";
 @use "./layout.scss";
 
@@ -9,7 +10,7 @@ $primary-color: #42b983;
 }
 
 body {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  font-family: "SplineSans", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--color-text);

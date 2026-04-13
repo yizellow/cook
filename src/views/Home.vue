@@ -11,7 +11,7 @@
           :layers="[menuConfig.snacks, menuConfig.chefs, availableMenuItems]"
           :selectedSegments="radialSegments"
           @update:selectedSegments="onRadialSelectedSegmentsChange"
-          :size="340"
+          :size="480"
         />
 
         <!-- Right: Dynamic Form -->
