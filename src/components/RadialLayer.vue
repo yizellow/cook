@@ -11,10 +11,6 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  segmentCount: {
-    type: Number,
-    default: 8,
-  },
   size: {
     type: Number,
     default: 300,
@@ -40,7 +36,7 @@ const props = defineProps({
 const emit = defineEmits(["update:selectedSegment", "segmentSelected"]);
 
 const labelReadyCount = ref(0);
-const totalLabels = ref(props.segments.length || props.segmentCount);
+const totalLabels = ref(props.segments.length);
 const transformsEnabled = ref(false);
 
 // workaround: wait for circle type transforms of lables to be applied before enabling own transforms
@@ -51,8 +47,8 @@ const handleLabelReady = () => {
   }
 };
 
-const circleSegmentCounts = computed(() => {
-  return props.segments.length || props.segmentCount;
+const segmentCount = computed(() => {
+  return props.segments.length;
 });
 
 const getSegmentLabel = (segmentIndex) => {
@@ -61,7 +57,7 @@ const getSegmentLabel = (segmentIndex) => {
 
 const getSegmentStyle = (segmentIndex) => {
   const positionOffset = props.circleWidth / 2 + 3;
-  const segmentAngleSize = (2 * Math.PI) / circleSegmentCounts.value;
+  const segmentAngleSize = (2 * Math.PI) / segmentCount.value;
   const segmentPositionAngle =
     segmentIndex * segmentAngleSize - segmentAngleSize / 2;
   const segmentRotationAngle = segmentPositionAngle + Math.PI / 2;
@@ -90,7 +86,7 @@ const getSegmentStyle = (segmentIndex) => {
 };
 
 const getCircleStyle = () => {
-  const segmentAngleSize = (2 * Math.PI) / circleSegmentCounts.value;
+  const segmentAngleSize = (2 * Math.PI) / segmentCount.value;
   const segmentAnglePosition =
     (props.selectedSegment * segmentAngleSize -
       segmentAngleSize / 2 +
@@ -119,14 +115,14 @@ const handleWheel = (e) => {
   if (!props.isSelectedCircle) return;
 
   const currentAngle =
-    (props.selectedSegment / circleSegmentCounts.value) * (2 * Math.PI);
+    (props.selectedSegment / segmentCount.value) * (2 * Math.PI);
   const scrollDelta = e.deltaY * 0.01;
   let newAngle = currentAngle - scrollDelta;
   newAngle = ((newAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
 
   const newSegment =
-    Math.floor((newAngle / (Math.PI * 2)) * circleSegmentCounts.value) %
-    circleSegmentCounts.value;
+    Math.floor((newAngle / (Math.PI * 2)) * segmentCount.value) %
+    segmentCount.value;
   emit("segmentSelected", {
     layerIndex: props.layerIndex,
     segmentIndex: newSegment,
@@ -143,7 +139,7 @@ const handleWheel = (e) => {
   >
     <slot></slot>
     <div
-      v-for="segmentIndex in circleSegmentCounts"
+      v-for="segmentIndex in segmentCount"
       :key="segmentIndex"
       class="radial-segment"
       :class="{ selected: selectedSegment == segmentIndex - 1 }"

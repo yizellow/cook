@@ -221,7 +221,7 @@ const resetOrderCount = () => {
                 </div>
                 <div class="drink">
                   <strong>Drink:</strong>
-                  {{ order.order?.drinkName || "None" }}
+                  {{ order.order?.drinkName.name || "None" }}
                 </div>
               </div>
 

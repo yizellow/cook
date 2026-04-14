@@ -1,13 +1,19 @@
 <script setup>
 import { computed, ref } from "vue";
 import SimpleWheel from "../components/SimpleWheel.vue";
+import RadialInterface from "../components/RadialInterface.vue";
 import ActionButton from "../components/ActionButton.vue";
 
 const savedOrderCount = Number(localStorage.getItem("order_counter") || "0");
 const orderCode = `${String(savedOrderCount + 1).padStart(3, "0")}`;
 
-const drinkOptions = ["Coffee", "Tea", "Water"];
-const selectedDrinkIndex = ref(0);
+const drinkOptions = [
+  { id: "coffee", name: "coffee" },
+  { id: "tea", name: "tea" },
+  { id: "water", name: "water" },
+];
+
+const selectedDrinkIndex = ref([0]);
 const selectedDrink = computed(() => drinkOptions[selectedDrinkIndex.value]);
 
 const selectedSnack = JSON.parse(
@@ -48,6 +54,11 @@ const formatParameterValue = (param, value) => {
     default:
       return String(value);
   }
+};
+
+const onDrinkSelectionChange = (segments) => {
+  console.log(segments);
+  selectedDrinkIndex.value = segments[0];
 };
 
 const submitOrder = async () => {
@@ -132,7 +143,7 @@ const submitOrder = async () => {
 
           <div class="receipt-section">
             <h2>Order</h2>
-            <p><strong>Drink:</strong> {{ selectedDrink }}</p>
+            <p><strong>Drink:</strong> {{ selectedDrink.name }}</p>
             <p><strong>Snack:</strong> {{ selectedSnack?.name || "None" }}</p>
             <p><strong>Chef:</strong> {{ selectedChef?.name || "None" }}</p>
             <p>
@@ -156,16 +167,13 @@ const submitOrder = async () => {
         </div>
 
         <div class="wheel-container">
-          <SimpleWheel
-            :options="drinkOptions"
-            :selectedIndex="selectedDrinkIndex"
-            @update:selectedIndex="
-              (index) => (selectedDrinkIndex.value = index)
-            "
-            :size="250"
-            :midiEnabled="true"
-            :midiChannel="0"
-            :midiControlNumber="70"
+          <RadialInterface
+            :layers="[drinkOptions]"
+            :selectedSegments="[selectedDrinkIndex]"
+            @update:selectedSegments="onDrinkSelectionChange"
+            :singleRing="true"
+            :size="400"
+            :midiControlNumbers="[73]"
           />
         </div>
       </div>
