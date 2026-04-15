@@ -1,20 +1,26 @@
 <template>
   <div class="selection-summary">
-    <h4>Current Selection</h4>
-    <div class="summary-item">
-      <strong>Snack:</strong> {{ selectedSnack?.name || 'None' }}
+    <h4>Deine Auswahl</h4>
+    <div class="summary-data">
+      <div class="summary-item">
+        <strong>Größe:</strong> <span>{{ selectedSnack?.name || "None" }}</span>
+      </div>
+      <div class="summary-item">
+        <strong>Kategorie: </strong>
+        <span>{{ selectedChef?.name || "None" }}</span>
+      </div>
     </div>
-    <div class="summary-item">
-      <strong>Chef/Media:</strong> {{ selectedChef?.name || 'None' }}
-    </div>
-    <div class="summary-item">
-      <strong>Menu Item:</strong> {{ selectedMenuItem?.name || 'None' }}
+    <div class="dish">
+      <div class="dish-title summary-item">
+        <span>{{ selectedMenuItem?.name || "None" }}</span>
+      </div>
+      <p class="description">{{ selectedMenuItem?.description || "…" }}</p>
     </div>
   </div>
 </template>
 
 <script setup>
-defineProps(['selectedSnack', 'selectedChef', 'selectedMenuItem']);
+defineProps(["selectedSnack", "selectedChef", "selectedMenuItem"]);
 </script>
 
 <style scoped>
@@ -22,17 +28,45 @@ defineProps(['selectedSnack', 'selectedChef', 'selectedMenuItem']);
   padding: 1rem;
   background: #f8f9fa;
   border-radius: 8px;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
+
+  h4 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1rem;
+    color: var(--color-text-faded);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+
+  .summary-data {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .summary-item {
+    span {
+      /*background-color: var(--color-blue);
+      padding: 0.25rem 0.5rem;
+      border: 3px solid var(--color-black);
+      border-radius: 0.25rem;*/
+    }
+  }
+
+  .dish {
+    .dish-title {
+      font-weight: 800;
+      margin-bottom: 0.25rem;
+    }
+
+    .description {
+      margin: 0;
+      font-size: 0.875rem;
+    }
+  }
 }
 
-.selection-summary h4 {
-  margin: 0 0 1rem 0;
-  font-size: 1.1rem;
-  color: #333;
-}
-
-.summary-item {
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
+.dish {
 }
 </style>

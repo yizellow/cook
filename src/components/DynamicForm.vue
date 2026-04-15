@@ -1,11 +1,11 @@
 <template>
   <div class="dynamic-form">
-    <h3>Parameters</h3>
     <ParameterField
-      v-for="param in parameters"
+      v-for="(param, index) in parameters"
       :key="param.id"
       :parameter="param"
       :value="values[param.id]"
+      :index="index + 1"
       @update:value="updateParameter(param.id, $event)"
     />
   </div>

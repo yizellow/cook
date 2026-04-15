@@ -2,8 +2,8 @@
   <section class="page menu-page">
     <div class="content-container">
       <div class="title-section">
-        <h1 class="title">Menu</h1>
-        <p class="subtitle">Select from the three layers</p>
+        <h1 class="title">CAPS Menü</h1>
+        <p class="subtitle">Drehe die Knöpfe und mixe deine Bestellung</p>
       </div>
 
       <div class="main-content">

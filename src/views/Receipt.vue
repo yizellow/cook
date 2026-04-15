@@ -8,9 +8,9 @@ const savedOrderCount = Number(localStorage.getItem("order_counter") || "0");
 const orderCode = `${String(savedOrderCount + 1).padStart(3, "0")}`;
 
 const drinkOptions = [
-  { id: "coffee", name: "coffee" },
-  { id: "tea", name: "tea" },
-  { id: "water", name: "water" },
+  { id: "coffee", name: "Kaffee" },
+  { id: "tea", name: "Tee" },
+  { id: "water", name: "Wasser" },
 ];
 
 const selectedDrinkIndex = ref([0]);
@@ -131,19 +131,18 @@ const submitOrder = async () => {
   <section class="page menu-page">
     <div class="content-container">
       <div class="title-section">
-        <h1 class="title">Order Review</h1>
+        <h1 class="title">Bestellübersicht</h1>
         <!-- <p class="subtitle">Select from the three layers</p> -->
       </div>
       <div class="main-content">
         <div class="order-summary">
           <div class="receipt-section">
-            <h2>Order Code</h2>
-            <p><strong>Code:</strong> {{ orderCode }}</p>
+            <h2>Bestellnummer</h2>
+            <p># {{ orderCode }}</p>
           </div>
 
           <div class="receipt-section">
             <h2>Order</h2>
-            <p><strong>Drink:</strong> {{ selectedDrink.name }}</p>
             <p><strong>Snack:</strong> {{ selectedSnack?.name || "None" }}</p>
             <p><strong>Chef:</strong> {{ selectedChef?.name || "None" }}</p>
             <p>
@@ -152,21 +151,27 @@ const submitOrder = async () => {
           </div>
 
           <div class="receipt-section" v-if="selectedMenuItem">
-            <h2>Parameters</h2>
+            <h2>Geschmacksprofil</h2>
             <div
               v-for="param in selectedMenuItem?.parameters || []"
               :key="param.id"
               class="parameter-item"
             >
-              <strong>{{ param.name }}:</strong>
+              <strong>{{ param.name }}: </strong>
               <span>{{
                 formatParameterValue(param, parameterValues[param.id])
               }}</span>
             </div>
           </div>
+
+          <div class="receipt-section" v-if="selectedMenuItem">
+            <h2>Getränk</h2>
+            <p>{{ selectedDrink.name }}</p>
+          </div>
         </div>
 
         <div class="wheel-container">
+          <p>Getränk gefällig, währrend deine Bestellung zubereitet wird?</p>
           <RadialInterface
             :layers="[drinkOptions]"
             :selectedSegments="[selectedDrinkIndex]"
@@ -201,7 +206,6 @@ const submitOrder = async () => {
 
 .wheel-container {
   flex-shrink: 0;
-  display: flex;
   justify-content: center;
   align-items: center;
 }

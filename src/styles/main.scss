@@ -1,20 +1,23 @@
-//test
-$primary-color: #42b983;
-
 @use "./fonts.scss";
 @use "./colors.scss";
 @use "./layout.scss";
+
+:root {
+  --font-sans: "SplineSans", Helvetica, Arial, sans-serif;
+  --font-mono: "SplineSansMono", monospace;
+}
 
 * {
   box-sizing: border-box;
 }
 
 body {
-  font-family: "SplineSans", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--color-text);
   margin-top: 60px;
   background-color: var(--color-background);
   margin: 0;
+  line-height: 1.5;
 }
