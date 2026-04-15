@@ -145,7 +145,7 @@ const deleteOrder = async (orderId) => {
 };
 
 const clearAllOrders = () => {
-  alert("Clear All is not connected to database yet. Order Co");
+  window.location.hash = "#/clear-orders";
 };
 
 const resetOrderCount = () => {
