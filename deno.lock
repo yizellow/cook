@@ -13,6 +13,7 @@
       "dependencies": [
         "npm:@vitejs/plugin-vue@^6.0.4",
         "npm:circletype@^2.3.0",
+        "npm:jspdf@^4.2.1",
         "npm:sass@^1.98.0",
         "npm:vite-plugin-vue-devtools@^8.0.6",
         "npm:vite@^7.3.1",

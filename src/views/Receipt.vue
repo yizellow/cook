@@ -66,7 +66,7 @@ const formatParameterValue = (param, value) => {
     case "spectrum":
       return `${value}%`;
     case "boolean":
-      return value ? "Yes" : "No";
+      return value ? "Ja" : "Nein";
     case "single-choice":
       return String(value);
     case "text":
@@ -162,10 +162,12 @@ const submitOrder = async () => {
 
           <div class="receipt-section">
             <h2>Order</h2>
-            <p><strong>Snack:</strong> {{ selectedSnack?.name || "None" }}</p>
-            <p><strong>Chef:</strong> {{ selectedChef?.name || "None" }}</p>
+            <p><strong>Portion:</strong> {{ selectedSnack?.name || "None" }}</p>
             <p>
-              <strong>Menu Item:</strong> {{ selectedMenuItem?.name || "None" }}
+              <strong>Kategorie:</strong> {{ selectedChef?.name || "None" }}
+            </p>
+            <p>
+              <strong>Gericht:</strong> {{ selectedMenuItem?.name || "None" }}
             </p>
           </div>
 

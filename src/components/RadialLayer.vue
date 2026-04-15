@@ -56,7 +56,7 @@ const getSegmentLabel = (segmentIndex) => {
 };
 
 const getSegmentStyle = (segmentIndex) => {
-  const positionOffset = props.circleWidth / 2 + 3;
+  const positionOffset = props.circleWidth / 2 - 4;
   const segmentAngleSize = (2 * Math.PI) / segmentCount.value;
   const segmentPositionAngle =
     segmentIndex * segmentAngleSize - segmentAngleSize / 2;

@@ -40,5 +40,6 @@ onMounted(() => {
   text-transform: uppercase;
   font-weight: 600;
   color: var(--color-text-faded);
+  /*font-size: 0.875rem;*/
 }
 </style>

@@ -57,7 +57,7 @@
     <!-- Boolean Toggle -->
     <div v-else-if="parameter.type === 'boolean'" class="boolean-group">
       <button :class="{ active: localValue }" @click="localValue = !localValue">
-        {{ localValue ? "Yes" : "No" }}
+        {{ localValue ? "Ja" : "Nein" }}
       </button>
     </div>
 

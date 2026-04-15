@@ -3,7 +3,8 @@
     <h4>Deine Auswahl</h4>
     <div class="summary-data">
       <div class="summary-item">
-        <strong>Größe:</strong> <span>{{ selectedSnack?.name || "None" }}</span>
+        <strong>Portion: </strong>
+        <span>{{ selectedSnack?.name || "None" }}</span>
       </div>
       <div class="summary-item">
         <strong>Kategorie: </strong>
