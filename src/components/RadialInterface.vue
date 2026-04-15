@@ -11,15 +11,16 @@ import MiddleRing from "./rings/MiddleRing.vue";
 import OuterRing2 from "./rings/OuterRing2.vue";
 import OuterRing3 from "./rings/OuterRing3.vue";
 import OuterRing4 from "./rings/OuterRing4.vue";
+import SingleRing from "./rings/SingleRing.vue";
 
 const props = defineProps({
   layers: {
     type: Array,
     default: () => [[], [], []],
   },
-  segmentCounts: {
-    type: Array,
-    default: () => [8, 8, 8], // fallback counts if layers are empty
+  singleRing: {
+    type: Boolean,
+    default: false,
   },
   selectedSegments: {
     type: Array,
@@ -50,6 +51,7 @@ const rings = [
 ];
 
 const circleWidth = computed(() => props.size * 0.15);
+
 const emit = defineEmits(["update:selectedSegments"]);
 
 const selectedCircle = ref(null);
@@ -137,22 +139,27 @@ onUnmounted(() => {
     class="radial-interface"
     :style="{ width: `${props.size}px`, height: `${props.size}px` }"
   >
-    <!-- Three concentric circle layers -->
     <RadialLayer
-      v-for="circleIndex in [2, 1, 0]"
-      :key="`layer-${circleIndex}-${JSON.stringify(props.layers[circleIndex])}`"
+      v-for="(layer, circleIndex) in layers"
+      :key="`layer-${circleIndex}-${JSON.stringify(layer)}`"
+      :class="`layer-${circleIndex}`"
       :layer-index="circleIndex"
-      :segments="props.layers[circleIndex]"
+      :segments="layer"
       :size="props.size"
       :selected-segment="internalSelectedSegments[circleIndex]"
       :is-selected-circle="selectedCircle === circleIndex"
-      :circle-width="circleWidth"
-      :radius="circleRadiuses[circleIndex]"
+      :circle-width="props.singleRing ? props.size * 0.5 : circleWidth"
+      :radius="props.singleRing ? props.size / 2 : circleRadiuses[circleIndex]"
       @mouseenter="handleCircleMouseEnter(circleIndex)"
       @mouseleave="handleCircleMouseLeave"
       @segment-selected="handleSegmentSelected"
     >
+      <SingleRing
+        v-if="props.singleRing"
+        :selected-segment="internalSelectedSegments[circleIndex]"
+      ></SingleRing>
       <component
+        v-if="!props.singleRing"
         :is="rings[circleIndex][segmentCounts[circleIndex] - 2]"
         :selected-segment="internalSelectedSegments[circleIndex]"
       ></component>
@@ -163,23 +170,26 @@ onUnmounted(() => {
 <style scoped>
 .radial-interface {
   position: relative;
-  margin: 20px auto;
+  margin: 2rem;
 }
 
 .radial-circle {
   &[data-layer*="0"] {
     --accent-color: var(--color-yellow);
     --accent-color-highlight: var(--color-yellow-highlight);
+    z-index: 3;
   }
 
   &[data-layer*="1"] {
     --accent-color: var(--color-pink);
     --accent-color-highlight: var(--color-pink-highlight);
+    z-index: 2;
   }
 
   &[data-layer*="2"] {
     --accent-color: var(--color-green);
     --accent-color-highlight: var(--color-green-highlight);
+    z-index: 1;
   }
 }
 </style>

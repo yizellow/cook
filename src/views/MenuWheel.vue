@@ -1,9 +1,16 @@
 <template>
-  <section class="page menu-wheel-page">
-    <div class="wheel-container">
-      <div class="title-section"></div>
-      <h1 class="title">Choose Your Order</h1>
-      <p class="subtitle">Select from the three layers</p>
+  <section class="page menu-page">
+    <div class="content-container">
+      <div class="title-section">
+        <div  class="title">
+          <!-- <img class="logo" src="../assets/hat-color.png"></img> -->
+          <img class="logo" src="../assets/caps-logo.png"></img>
+          <h1>Menü</h1>
+
+        </div>
+
+        <p class="subtitle">Drehe die Knöpfe und mixe deine Bestellung</p>
+      </div>
 
       <div class="main-content">
         <!-- Left: Wheel Selector -->
@@ -30,8 +37,12 @@
       </div>
 
       <div class="nav-buttons">
-        <button class="back-btn" @click="goBack">Back / Zurück</button>
-        <button class="next-btn" @click="goNext">Next / Weiter</button>
+        <ActionButton
+          text="Next"
+          type="secondary"
+          shortcutKey="ArrowRight"
+          @click="goNext"
+        />
       </div>
     </div>
   </section>
@@ -42,6 +53,7 @@ import { computed, ref, watch } from "vue";
 import RadialInterface from "../components/RadialInterface.vue";
 import DynamicForm from "../components/DynamicForm.vue";
 import SelectionSummary from "../components/SelectionSummary.vue";
+import ActionButton from "../components/ActionButton.vue";
 import { useMenuSelection } from "../composables/useMenuSelection.js";
 import { menuConfig } from "../config/menuConfig.js";
 
@@ -108,10 +120,6 @@ const onRadialSelectedSegmentsChange = (segments) => {
   }
 };
 
-const goBack = () => {
-  window.location.hash = "#/";
-};
-
 const goNext = () => {
   if (!selectedChef.value || !selectedMenuItem.value) {
     alert(
@@ -124,90 +132,12 @@ const goNext = () => {
 };
 </script>
 
-<style scoped>
-.menu-wheel-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 2rem;
-}
+<style scoped lang="scss">
+@use "../styles/menuPage.scss";
 
-.wheel-container {
-  max-width: 1200px;
-  width: 100%;
+.form-section {
+  flex-grow: 1;
+  max-width: 400px;
   height: 100%;
-  max-height: 1000px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.title {
-  text-align: center;
-  margin-bottom: 0.5rem;
-  font-size: 2rem;
-}
-
-.subtitle {
-  text-align: center;
-  margin-bottom: 2rem;
-  color: #666;
-}
-
-.main-content {
-  display: flex;
-  gap: 2rem;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  height: 100%;
-
-  .wheel-section {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    height: 100%;
-  }
-
-  .form-section {
-    flex: 1;
-    max-width: 400px;
-    height: 100%;
-  }
-}
-
-.nav-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.back-btn,
-.next-btn {
-  padding: 1rem 2rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.back-btn {
-  background: #6c757d;
-  color: white;
-}
-
-.back-btn:hover {
-  background: #5a6268;
-}
-
-.next-btn {
-  background: #007bff;
-  color: white;
-}
-
-.next-btn:hover {
-  background: #0056b3;
 }
 </style>

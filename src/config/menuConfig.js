@@ -2,19 +2,19 @@
 export const menuConfig = {
   // Layer 1: Snacks (independent state, doesn't affect right panel)
   snacks: [
-    { id: "menu", name: "Menu", description: "Standard menu flow" },
-    { id: "snack", name: "Snack", description: "Quick snack option" },
+    { id: "small", name: "klein", description: "Standard menu flow" },
+    { id: "large", name: "groß", description: "Quick snack option" },
   ],
 
   // Layer 2: Chefs/Media (determines menuItems and right panel scope)
   chefs: [
     {
-      id: "drawing",
-      name: "Drawing",
+      id: "landscape",
+      name: "Wildfang",
       menuItems: [
         {
-          id: "landscape",
-          name: "Landscape",
+          id: "brotzeit",
+          name: "Brotzeitbrettl",
           parameters: [
             {
               id: "trees",
@@ -49,8 +49,44 @@ export const menuConfig = {
           ],
         },
         {
-          id: "human",
-          name: "Human",
+          id: "wurst",
+          name: "Wurschtteller",
+          parameters: [
+            {
+              id: "trees",
+              name: "Trees",
+              type: "percentage",
+              min: 0,
+              max: 100,
+              default: 30,
+            },
+            {
+              id: "stones",
+              name: "Stones",
+              type: "percentage",
+              min: 0,
+              max: 100,
+              default: 20,
+            },
+            {
+              id: "mountains",
+              name: "Mountains",
+              type: "range",
+              min: 1,
+              max: 10,
+              default: 6,
+            },
+            {
+              id: "waterFeatures",
+              name: "Water Features",
+              type: "boolean",
+              default: false,
+            },
+          ],
+        },
+        {
+          id: "aufschnitt",
+          name: "Frängischer Aufschnitt",
           parameters: [
             {
               id: "gender",
@@ -85,152 +121,61 @@ export const menuConfig = {
             },
           ],
         },
-        {
-          id: "abstract",
-          name: "Abstract",
-          parameters: [
-            {
-              id: "lines",
-              name: "Lines",
-              type: "percentage",
-              min: 0,
-              max: 100,
-              default: 40,
-            },
-            {
-              id: "points",
-              name: "Points",
-              type: "percentage",
-              min: 0,
-              max: 100,
-              default: 30,
-            },
-            {
-              id: "faces",
-              name: "Faces",
-              type: "percentage",
-              min: 0,
-              max: 100,
-              default: 10,
-            },
-            {
-              id: "monochromeColorful",
-              name: "Monochrome ↔ Colorful",
-              type: "spectrum",
-              min: -50,
-              max: 50,
-              labels: ["Monochrome", "Colorful"],
-              default: 0,
-            },
-          ],
-        },
-        {
-          id: "object",
-          name: "Object",
-          parameters: [
-            {
-              id: "approximateSize",
-              name: "Approximate Size",
-              type: "range",
-              min: 0.01,
-              max: 10,
-              step: 0.01,
-              default: 1,
-            },
-            {
-              id: "mundaneSpecial",
-              name: "Mundane ↔ Special",
-              type: "spectrum",
-              min: -50,
-              max: 50,
-              labels: ["Mundane", "Special"],
-              default: 0,
-            },
-            {
-              id: "organicArtificial",
-              name: "Organic ↔ Artificial",
-              type: "spectrum",
-              min: -50,
-              max: 50,
-              labels: ["Organic", "Artificial"],
-              default: 0,
-            },
-          ],
-        },
       ],
     },
     {
-      id: "3d-rendering",
-      name: "3D Rendering",
+      id: "bits",
+      name: "Bits & Bites",
       menuItems: [
         {
-          id: "emotional-sculpture",
-          name: "Emotional Sculpture",
+          id: "reklame",
+          name: "Reklame Häppchen",
+          description:
+            "Dein persönlicher Aufmerksamkeitsknaller des Tages, herzhaft und pikant gewürzt und im world wide web serviert.",
           parameters: [
             {
-              id: "angry",
-              name: "Angry",
-              type: "percentage",
-              min: 0,
-              max: 100,
-              default: 20,
+              id: "category",
+              name: "Category",
+              type: "single-choice",
+              options: ["Event", "Product"],
+              default: "Product",
             },
             {
-              id: "excited",
-              name: "Excited",
-              type: "percentage",
-              min: 0,
-              max: 100,
-              default: 30,
+              id: "language",
+              name: "Language",
+              type: "single-choice",
+              options: ["Deutsch", "English"],
+              default: "English",
             },
             {
-              id: "bored",
-              name: "Bored",
-              type: "percentage",
-              min: 0,
-              max: 100,
-              default: 10,
-            },
-          ],
-        },
-        {
-          id: "cubic-structure",
-          name: "Cubic Structure",
-          parameters: [
-            {
-              id: "colors",
-              name: "Colors",
-              type: "range",
-              min: 1,
-              max: 5,
-              default: 3,
-            },
-            {
-              id: "complexity",
-              name: "Complexity",
+              id: "seriousness",
+              name: "Seriousness",
               type: "percentage",
               min: 0,
               max: 100,
               default: 50,
             },
             {
-              id: "material",
-              name: "Material",
-              type: "single-choice",
-              options: ["Metallic", "Glass", "Opaque"],
-              default: "Metallic",
+              id: "loudness",
+              name: "Loudness",
+              type: "percentage",
+              min: 0,
+              max: 100,
+              default: 30,
             },
+
+            // {
+            //   id: "description",
+            //   name: "Description",
+            //   type: "text",
+            //   placeholder: "Tell the artist what you want to advertise",
+            //   default: "",
+            // },
           ],
         },
-      ],
-    },
-    {
-      id: "website",
-      name: "Website",
-      menuItems: [
         {
-          id: "game",
-          name: "Game",
+          id: "binary",
+          name: "Binäre Molekularküche",
           parameters: [
             {
               id: "speed",
@@ -258,75 +203,32 @@ export const menuConfig = {
           ],
         },
         {
-          id: "interactive-typography",
-          name: "Interactive Typography",
+          id: "knoedel",
+          name: "Knödeltris",
           parameters: [
             {
-              id: "fragileBold",
-              name: "Fragile ↔ Bold",
-              type: "spectrum",
-              min: -50,
-              max: 50,
-              labels: ["Fragile", "Bold"],
-              default: 0,
-            },
-            {
-              id: "illustrations",
-              name: "Illustrations",
+              id: "angry",
+              name: "Angry",
               type: "percentage",
               min: 0,
               max: 100,
-              default: 50,
+              default: 20,
             },
             {
-              id: "textSource",
-              name: "Text Source",
-              type: "single-choice",
-              options: ["Novel", "Poem", "Magazine", "Random"],
-              default: "Novel",
-            },
-          ],
-        },
-        {
-          id: "advertisement",
-          name: "Advertisement",
-          parameters: [
-            {
-              id: "language",
-              name: "Language",
-              type: "single-choice",
-              options: ["Deutsch", "English"],
-              default: "English",
-            },
-            {
-              id: "seriousness",
-              name: "Seriousness",
-              type: "percentage",
-              min: 0,
-              max: 100,
-              default: 50,
-            },
-            {
-              id: "loudness",
-              name: "Loudness",
+              id: "excited",
+              name: "Excited",
               type: "percentage",
               min: 0,
               max: 100,
               default: 30,
             },
             {
-              id: "category",
-              name: "Category",
-              type: "single-choice",
-              options: ["Event", "Product"],
-              default: "Product",
-            },
-            {
-              id: "description",
-              name: "Description",
-              type: "text",
-              placeholder: "Tell the artist what you want to advertise",
-              default: "",
+              id: "bored",
+              name: "Bored",
+              type: "percentage",
+              min: 0,
+              max: 100,
+              default: 10,
             },
           ],
         },
@@ -334,11 +236,11 @@ export const menuConfig = {
     },
     {
       id: "doodle",
-      name: "Doodle",
+      name: "Doodle Noodle",
       menuItems: [
         {
-          id: "category",
-          name: "Category",
+          id: "spaghetti",
+          name: "Spaghetti Monsters",
           parameters: [
             {
               id: "category",
@@ -350,8 +252,89 @@ export const menuConfig = {
           ],
         },
         {
-          id: "mood",
-          name: "Mood",
+          id: "moody",
+          name: "Moody Pasta",
+          parameters: [
+            {
+              id: "moistDry",
+              name: "Moist ↔ Dry",
+              type: "spectrum",
+              min: -50,
+              max: 50,
+              labels: ["Moist", "Dry"],
+              default: 0,
+            },
+            {
+              id: "realityDream",
+              name: "Reality ↔ Dream",
+              type: "spectrum",
+              min: -50,
+              max: 50,
+              labels: ["Reality", "Dream"],
+              default: 0,
+            },
+            {
+              id: "seasons",
+              name: "Seasons",
+              type: "single-choice",
+              options: ["Spring", "Summer", "Autumn", "Winter"],
+              default: "Spring",
+            },
+          ],
+        },
+        {
+          id: "tagliatelle",
+          name: "Tagliatelle al Struttura",
+          parameters: [
+            {
+              id: "moistDry",
+              name: "Moist ↔ Dry",
+              type: "spectrum",
+              min: -50,
+              max: 50,
+              labels: ["Moist", "Dry"],
+              default: 0,
+            },
+            {
+              id: "realityDream",
+              name: "Reality ↔ Dream",
+              type: "spectrum",
+              min: -50,
+              max: 50,
+              labels: ["Reality", "Dream"],
+              default: 0,
+            },
+            {
+              id: "seasons",
+              name: "Seasons",
+              type: "single-choice",
+              options: ["Spring", "Summer", "Autumn", "Winter"],
+              default: "Spring",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "fresh",
+      name: "Fangfrisch",
+      menuItems: [
+        {
+          id: "ramen",
+          name: "Zitteraal-Ramen",
+          parameters: [
+            {
+              id: "category",
+              name: "Category",
+              type: "single-choice",
+              options: ["Character", "Monster", "Landscape", "Other"],
+              default: "Character",
+            },
+          ],
+        },
+        {
+          id: "sushi",
+          name: "Running Sushi",
           parameters: [
             {
               id: "moistDry",

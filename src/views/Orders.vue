@@ -221,7 +221,7 @@ const resetOrderCount = () => {
                 </div>
                 <div class="drink">
                   <strong>Drink:</strong>
-                  {{ order.order?.drinkName || "None" }}
+                  {{ order.order?.drinkName.name || "None" }}
                 </div>
               </div>
 
@@ -275,6 +275,12 @@ const resetOrderCount = () => {
 </template>
 
 <style scoped lang="scss">
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .orders-page {
   max-width: 1400px;
   padding: 3rem 0;

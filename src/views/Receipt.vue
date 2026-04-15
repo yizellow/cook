@@ -1,12 +1,19 @@
 <script setup>
 import { computed, ref } from "vue";
 import SimpleWheel from "../components/SimpleWheel.vue";
+import RadialInterface from "../components/RadialInterface.vue";
+import ActionButton from "../components/ActionButton.vue";
 
 const savedOrderCount = Number(localStorage.getItem("order_counter") || "0");
 const orderCode = `${String(savedOrderCount + 1).padStart(3, "0")}`;
 
-const drinkOptions = ["Coffee", "Tea", "Water"];
-const selectedDrinkIndex = ref(0);
+const drinkOptions = [
+  { id: "coffee", name: "Kaffee" },
+  { id: "tea", name: "Tee" },
+  { id: "water", name: "Wasser" },
+];
+
+const selectedDrinkIndex = ref([0]);
 const selectedDrink = computed(() => drinkOptions[selectedDrinkIndex.value]);
 
 const selectedSnack = JSON.parse(
@@ -47,6 +54,11 @@ const formatParameterValue = (param, value) => {
     default:
       return String(value);
   }
+};
+
+const onDrinkSelectionChange = (segments) => {
+  console.log(segments);
+  selectedDrinkIndex.value = segments[0];
 };
 
 const submitOrder = async () => {
@@ -107,7 +119,7 @@ const submitOrder = async () => {
     localStorage.removeItem("parameterValues");
 
     alert("Order submitted successfully!");
-    window.location.hash = "#/orders";
+    window.location.hash = "#/menu-wheel";
   } catch (error) {
     console.error("Submit order error:", error);
     alert("Failed to submit order");
@@ -116,80 +128,84 @@ const submitOrder = async () => {
 </script>
 
 <template>
-  <section class="page">
-    <div class="art-card receipt-page">
-      <h1 class="title">Receipt</h1>
-      <p class="subtitle">Zusammenfassung / Summary</p>
-
-      <div class="receipt-section">
-        <h2>Order Code</h2>
-        <p><strong>Code:</strong> {{ orderCode }}</p>
+  <section class="page menu-page">
+    <div class="content-container">
+      <div class="title-section">
+        <h1 class="title">Bestellübersicht</h1>
+        <!-- <p class="subtitle">Select from the three layers</p> -->
       </div>
+      <div class="main-content">
+        <div class="order-summary">
+          <div class="receipt-section">
+            <h2>Bestellnummer</h2>
+            <p># {{ orderCode }}</p>
+          </div>
 
-      <div class="receipt-section">
-        <h2>Order</h2>
-        <p><strong>Drink:</strong> {{ selectedDrink }}</p>
-        <p><strong>Snack:</strong> {{ selectedSnack?.name || "None" }}</p>
-        <p><strong>Chef:</strong> {{ selectedChef?.name || "None" }}</p>
-        <p>
-          <strong>Menu Item:</strong> {{ selectedMenuItem?.name || "None" }}
-        </p>
-      </div>
+          <div class="receipt-section">
+            <h2>Order</h2>
+            <p><strong>Snack:</strong> {{ selectedSnack?.name || "None" }}</p>
+            <p><strong>Chef:</strong> {{ selectedChef?.name || "None" }}</p>
+            <p>
+              <strong>Menu Item:</strong> {{ selectedMenuItem?.name || "None" }}
+            </p>
+          </div>
 
-      <div class="receipt-section" v-if="selectedMenuItem">
-        <h2>Parameters</h2>
-        <div
-          v-for="param in selectedMenuItem?.parameters || []"
-          :key="param.id"
-          class="parameter-item"
-        >
-          <strong>{{ param.name }}:</strong>
-          <span>{{
-            formatParameterValue(param, parameterValues[param.id])
-          }}</span>
+          <div class="receipt-section" v-if="selectedMenuItem">
+            <h2>Geschmacksprofil</h2>
+            <div
+              v-for="param in selectedMenuItem?.parameters || []"
+              :key="param.id"
+              class="parameter-item"
+            >
+              <strong>{{ param.name }}: </strong>
+              <span>{{
+                formatParameterValue(param, parameterValues[param.id])
+              }}</span>
+            </div>
+          </div>
+
+          <div class="receipt-section" v-if="selectedMenuItem">
+            <h2>Getränk</h2>
+            <p>{{ selectedDrink.name }}</p>
+          </div>
+        </div>
+
+        <div class="wheel-container">
+          <p>Getränk gefällig, währrend deine Bestellung zubereitet wird?</p>
+          <RadialInterface
+            :layers="[drinkOptions]"
+            :selectedSegments="[selectedDrinkIndex]"
+            @update:selectedSegments="onDrinkSelectionChange"
+            :singleRing="true"
+            :size="400"
+            :midiControlNumbers="[73]"
+          />
         </div>
       </div>
 
       <div class="nav-buttons">
-        <button class="back-btn" @click="goBack">Back / Zurück</button>
-        <button class="submit-btn" @click="submitOrder">
-          Submit Order / Bestellung einreichen
-        </button>
-        <button class="next-btn" @click="goHome">Home / Start</button>
+        <ActionButton
+          text="Back"
+          type="back"
+          shortcutKey="ArrowLeft"
+          @click="goBack"
+        />
+        <ActionButton
+          text="Submit"
+          type="primary"
+          shortcutKey="ArrowRight"
+          @click="submitOrder"
+        />
       </div>
-    </div>
-
-    <div class="wheel-container">
-      <SimpleWheel
-        :options="drinkOptions"
-        :selectedIndex="selectedDrinkIndex"
-        @update:selectedIndex="(index) => (selectedDrinkIndex.value = index)"
-        :size="250"
-        :midiEnabled="true"
-        :midiChannel="0"
-        :midiControlNumber="70"
-      />
     </div>
   </section>
 </template>
 
 <style scoped lang="scss">
-.page {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 40px;
-  flex-wrap: wrap;
-}
-
-.art-card.receipt-page {
-  flex: 1;
-  min-width: 300px;
-}
+@use "../styles/menuPage.scss";
 
 .wheel-container {
   flex-shrink: 0;
-  display: flex;
   justify-content: center;
   align-items: center;
 }
