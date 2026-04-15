@@ -6,6 +6,7 @@ import MenuWheel from "./views/MenuWheel.vue";
 import ChefDetail from "./views/ChefDetail.vue";
 import Receipt from "./views/Receipt.vue";
 import Orders from "./views/Orders.vue";
+import ClearOrders from "./views/ClearOrders.vue";
 import NotFound from "./views/NotFound.vue";
 
 const routes = {
@@ -15,6 +16,7 @@ const routes = {
   "/chef-detail": ChefDetail,
   "/receipt": Receipt,
   "/orders": Orders,
+  "/clear-orders": ClearOrders,
 };
 
 const currentPath = ref(window.location.hash || "#/menu-wheel");
