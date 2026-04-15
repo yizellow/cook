@@ -147,11 +147,6 @@ const deleteOrder = async (orderId) => {
 const clearAllOrders = () => {
   window.location.hash = "#/clear-orders";
 };
-
-const resetOrderCount = () => {
-  localStorage.setItem("order_counter", 0);
-  alert("Order count was reset to 0.");
-};
 </script>
 
 <template>
@@ -261,13 +256,6 @@ const resetOrderCount = () => {
           @click="clearAllOrders"
         >
           Clear All / Alles löschen
-        </button>
-        <button
-          v-if="orders.length > 0"
-          class="clear-btn"
-          @click="resetOrderCount"
-        >
-          Reset Order Counter
         </button>
       </div>
     </div>

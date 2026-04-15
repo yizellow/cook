@@ -1,11 +1,11 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import SimpleWheel from "../components/SimpleWheel.vue";
 import RadialInterface from "../components/RadialInterface.vue";
 import ActionButton from "../components/ActionButton.vue";
 
-const savedOrderCount = Number(localStorage.getItem("order_counter") || "0");
-const orderCode = `${String(savedOrderCount + 1).padStart(3, "0")}`;
+const orderCode = ref("001"); // 預設值
+const isLoadingOrderCode = ref(true);
 
 const drinkOptions = [
   { id: "coffee", name: "Kaffee" },
@@ -26,6 +26,26 @@ const selectedMenuItem = JSON.parse(
 const parameterValues = JSON.parse(
   localStorage.getItem("parameterValues") || "{}",
 );
+
+// 在組件載入時獲取下一個訂單編號
+onMounted(async () => {
+  try {
+    const res = await fetch("/.netlify/functions/get-next-order-code");
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      orderCode.value = data.nextOrderCode;
+    } else {
+      console.error("Failed to get next order code:", data.error);
+      // 保留預設值
+    }
+  } catch (error) {
+    console.error("Error fetching next order code:", error);
+    // 保留預設值
+  } finally {
+    isLoadingOrderCode.value = false;
+  }
+});
 
 const goBack = () => {
   window.location.hash = "#/menu-wheel";
@@ -76,9 +96,9 @@ const submitOrder = async () => {
     }));
 
     const payload = {
-      orderCode,
+      orderCode: orderCode.value,
       order: {
-        drinkName: selectedDrink.value,
+        drinkName: selectedDrink.value.name,
         snackName: selectedSnack?.name || "",
         chefId: selectedChef?.id || "",
         chefName: selectedChef?.name || "",
@@ -112,7 +132,6 @@ const submitOrder = async () => {
       return;
     }
 
-    localStorage.setItem("order_counter", String(savedOrderCount + 1));
     localStorage.removeItem("selectedSnack");
     localStorage.removeItem("selectedChef");
     localStorage.removeItem("selectedMenuItem");
