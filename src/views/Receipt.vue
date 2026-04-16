@@ -150,18 +150,16 @@ const submitOrder = async () => {
   <section class="page menu-page">
     <div class="content-container">
       <div class="title-section">
-        <h1 class="title">Bestellübersicht</h1>
-        <!-- <p class="subtitle">Select from the three layers</p> -->
+        <div  class="title">
+          <!-- <img class="logo" src="../assets/hat-color.png"></img> -->
+          <img class="logo" src="../assets/caps-logo.png"></img>
+          <h1>Menü</h1>
+        </div>
       </div>
       <div class="main-content">
         <div class="order-summary">
           <div class="receipt-section">
-            <h2>Bestellnummer</h2>
-            <p># {{ orderCode }}</p>
-          </div>
-
-          <div class="receipt-section">
-            <h2>Order</h2>
+            <h2>Bestellung</h2>
             <p><strong>Portion:</strong> {{ selectedSnack?.name || "None" }}</p>
             <p>
               <strong>Kategorie:</strong> {{ selectedChef?.name || "None" }}
@@ -171,8 +169,11 @@ const submitOrder = async () => {
             </p>
           </div>
 
+          <hr></hr>
+
+
           <div class="receipt-section" v-if="selectedMenuItem">
-            <h2>Geschmacksprofil</h2>
+            <h3>Geschmacksprofil</h3>
             <div
               v-for="param in selectedMenuItem?.parameters || []"
               :key="param.id"
@@ -185,14 +186,23 @@ const submitOrder = async () => {
             </div>
           </div>
 
+          <hr></hr>
+
+
           <div class="receipt-section" v-if="selectedMenuItem">
-            <h2>Getränk</h2>
-            <p>{{ selectedDrink.name }}</p>
+            <p><strong>Getränk: </strong>{{ selectedDrink.name }}</p>
+          </div>
+
+          <hr></hr>
+
+          <div class="receipt-section">
+            <p><strong>Bestellnummer: </strong># {{ orderCode }}</p>
           </div>
         </div>
 
         <div class="wheel-container">
-          <p>Getränk gefällig, währrend deine Bestellung zubereitet wird?</p>
+          <h3>Getränk</h3>
+          <p>Wird serviert während deine Bestellung zubereitet wird.</p>
           <RadialInterface
             :layers="[drinkOptions]"
             :selectedSegments="[selectedDrinkIndex]"
@@ -206,13 +216,13 @@ const submitOrder = async () => {
 
       <div class="nav-buttons">
         <ActionButton
-          text="Back"
+          text="Zurück"
           type="back"
           shortcutKey="ArrowLeft"
           @click="goBack"
         />
         <ActionButton
-          text="Submit"
+          text="Absenden"
           type="primary"
           shortcutKey="ArrowRight"
           @click="submitOrder"
@@ -229,5 +239,49 @@ const submitOrder = async () => {
   flex-shrink: 0;
   justify-content: center;
   align-items: center;
+  margin: 0 auto;
+  margin-top: 4rem;
+  padding: 2rem 0;
+  max-height: 600px;
+
+  h3 {
+    margin: 0;
+  }
+
+  p {
+    margin: .25rem 0;
+  }
+}
+
+.order-summary {
+  background: white;
+  margin: 0 auto;
+  padding: 2rem 3rem;
+
+  h2 {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  p {
+    margin: 0.5rem 0;
+  }
+
+  .parameter-item {
+    margin: 0.125rem 0;
+    p {
+      margin: 0;
+    }
+  }
+
+  h3 {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  hr {
+    border: 1px solid var(--color-outline-faded);
+    margin: 1rem 0;
+  }
 }
 </style>

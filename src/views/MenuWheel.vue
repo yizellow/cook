@@ -6,10 +6,7 @@
           <!-- <img class="logo" src="../assets/hat-color.png"></img> -->
           <img class="logo" src="../assets/caps-logo.png"></img>
           <h1>Menü</h1>
-
         </div>
-
-        <p class="subtitle">Drehe die Knöpfe und mixe deine Bestellung</p>
       </div>
 
       <div class="main-content">

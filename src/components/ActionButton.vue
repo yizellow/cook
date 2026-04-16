@@ -83,10 +83,10 @@ onUnmounted(() => {
 .app-button {
   position: relative;
   padding: 0.25rem 0.5rem;
-  border: 4px solid var(--color-outline);
+  border: 3px solid var(--color-outline);
   border-radius: 8px;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   display: inline-flex;
@@ -109,11 +109,11 @@ onUnmounted(() => {
 
 /* Button types */
 .app-button--primary {
-  background-color: var(--color-blue);
+  background-color: var(--color-blue-highlight);
 }
 
 .app-button--primary:hover:not(:disabled) {
-  background-color: var(--color-blue-highlight);
+  background-color: var(--color-blue);
 }
 
 .app-button--secondary {
