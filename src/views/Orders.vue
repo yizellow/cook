@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { jsPDF } from "jspdf";
+import { generateOrderPdf, openPdfWithName } from "@/utils/pdfUtils";
 
 const orders = ref([]);
 const isLoading = ref(true);
@@ -55,64 +55,12 @@ const getParameterList = (order) => {
   return Array.isArray(parameters) ? parameters : [];
 };
 
-const openPdf = (orderId) => {
+const openPdf = async (orderId) => {
   const order = orders.value.find((o) => o._id === orderId);
   if (!order) return;
 
-  const doc = new jsPDF({ unit: "mm", format: [57, 100] });
-  const yGap = 5;
-
-  // Add title
-  doc.setFontSize(10);
-  doc.text("Order Receipt", 15, 20);
-
-  // Add order details
-  doc.setFontSize(6);
-  let yPos = 30;
-
-  doc.text(`Order Code: ${order.orderCode || "Unknown"}`, 5, yPos);
-  yPos += yGap;
-
-  doc.text(`Chef: ${order.order?.chefName || "Unknown Chef"}`, 5, yPos);
-  yPos += yGap;
-
-  doc.text(
-    `Menu Item: ${order.order?.menuItemName || "Unknown Item"}`,
-    5,
-    yPos,
-  );
-  yPos += yGap;
-
-  doc.text(`Drink: ${order.order?.drinkName || "None"}`, 5, yPos);
-  yPos += yGap;
-
-  doc.text(`Snack: ${order.order?.snackName || "None"}`, 5, yPos);
-  yPos += yGap;
-
-  // Add parameters if any
-  if (order.order?.parameters && order.order.parameters.length > 0) {
-    yPos += 5;
-    doc.text("Parameters:", 5, yPos);
-    yPos += yGap;
-
-    order.order.parameters.forEach((param) => {
-      doc.text(`${param.name}: ${param.value}`, 8, yPos);
-      yPos += yGap;
-    });
-  }
-
-  // Add date
-  yPos += yGap;
-  doc.text(
-    `Created: ${order.createdAt ? new Date(order.createdAt).toLocaleString() : "Unknown"}`,
-    5,
-    yPos,
-  );
-
-  // Open PDF in new tab
-  const pdfBlob = doc.output("blob");
-  const pdfUrl = URL.createObjectURL(pdfBlob);
-  window.open(pdfUrl, "_blank");
+  const doc = await generateOrderPdf(order);
+  openPdfWithName(doc, `order-${order.orderCode || 'unknown'}`);
 };
 
 const deleteOrder = async (orderId) => {
@@ -265,7 +213,7 @@ const clearAllOrders = () => {
 <style scoped lang="scss">
 .page {
   display: flex;
-  align-items: center;
+  /* align-items: center; */
   justify-content: center;
 }
 
