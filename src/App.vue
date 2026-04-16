@@ -7,6 +7,7 @@ import ChefDetail from "./views/ChefDetail.vue";
 import Receipt from "./views/Receipt.vue";
 import Orders from "./views/Orders.vue";
 import ClearOrders from "./views/ClearOrders.vue";
+import ThankYou from "./views/ThankYou.vue";
 import NotFound from "./views/NotFound.vue";
 
 const routes = {
@@ -17,6 +18,7 @@ const routes = {
   "/receipt": Receipt,
   "/orders": Orders,
   "/clear-orders": ClearOrders,
+  "/thank-you": ThankYou,
 };
 
 const currentPath = ref(window.location.hash || "#/menu-wheel");
@@ -26,7 +28,14 @@ window.addEventListener("hashchange", () => {
 });
 
 const currentView = computed(() => {
-  return routes[currentPath.value.slice(1) || "/"] || NotFound;
+  const path = currentPath.value.slice(1) || "/";
+  
+  // Handle thank-you route with order code
+  if (path.startsWith("/thank-you/")) {
+    return ThankYou;
+  }
+  
+  return routes[path] || NotFound;
 });
 </script>
 

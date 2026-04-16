@@ -118,6 +118,8 @@ onUnmounted(() => {
   gap: 0.25rem;
   min-width: 6rem;
   color: var(--color-text);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .app-button__icon {

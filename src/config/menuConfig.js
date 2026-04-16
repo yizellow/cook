@@ -159,7 +159,7 @@ export const menuConfig = {
             },
             {
               id: "item",
-              name: "Werbeobjekt",
+              name: "Präsentationsobjekt",
               type: "single-choice",
               options: ["Event", "Produkt", "Statement"],
               default: "Event",

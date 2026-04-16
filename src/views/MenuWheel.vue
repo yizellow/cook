@@ -71,6 +71,21 @@ const {
 
 const radialSegments = ref([0, 0, 0]);
 
+// Auto-select first items on each layer if nothing is selected
+const initializeSelections = () => {
+  if (!selectedSnack.value && menuConfig.snacks.length > 0) {
+    selectSnack(menuConfig.snacks[0]);
+  }
+  
+  if (!selectedChef.value && menuConfig.chefs.length > 0) {
+    selectChef(menuConfig.chefs[0]);
+  }
+  
+  if (!selectedMenuItem.value && availableMenuItems.value.length > 0) {
+    selectMenuItem(availableMenuItems.value[0]);
+  }
+};
+
 const syncRadialSegments = () => {
   const snackIndex = menuConfig.snacks.findIndex(
     (snack) => snack.id === selectedSnack.value?.id,
@@ -79,7 +94,7 @@ const syncRadialSegments = () => {
     (chef) => chef.id === selectedChef.value?.id,
   );
   const menuIndex = availableMenuItems.value.findIndex(
-    (item) => item.id === selectedMenuItem.value?.id,
+    (item) => item.id === selectedMenuItem.value?.id || 0,
   );
 
   radialSegments.value = [
@@ -90,6 +105,7 @@ const syncRadialSegments = () => {
 };
 
 syncRadialSegments();
+initializeSelections();
 
 watch(
   [selectedSnack, selectedChef, selectedMenuItem, availableMenuItems],

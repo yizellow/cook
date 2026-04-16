@@ -132,13 +132,13 @@ const submitOrder = async () => {
       return;
     }
 
-    localStorage.removeItem("selectedSnack");
+     localStorage.removeItem("selectedSnack");
     localStorage.removeItem("selectedChef");
     localStorage.removeItem("selectedMenuItem");
     localStorage.removeItem("parameterValues");
 
-    alert("Order submitted successfully!");
-    window.location.hash = "#/menu-wheel";
+     // Redirect to thank you page with order code
+    window.location.hash = `#/thank-you/${orderCode.value}`;
   } catch (error) {
     console.error("Submit order error:", error);
     alert("Failed to submit order");
@@ -261,6 +261,7 @@ const submitOrder = async () => {
   background: white;
   margin: 0 auto;
   padding: 2rem 3rem;
+  min-width: 20rem;
 
   h2 {
     text-transform: uppercase;
