@@ -42,6 +42,10 @@ const props = defineProps({
     type: Array,
     default: () => [70, 71, 72], // MIDI CC numbers for [inner, middle, outer] circles
   },
+  randomInterval: {
+    type: Number,
+    default: 200, // 100ms interval for random generation
+  },
 });
 
 const rings = [
@@ -56,6 +60,8 @@ const emit = defineEmits(["update:selectedSegments"]);
 
 const selectedCircle = ref(null);
 const internalSelectedSegments = ref([...props.selectedSegments]);
+const randomGeneratorActive = ref(false);
+const randomIntervalId = ref(null);
 
 const circleRadiuses = computed(() => {
   return props.layers.map((layer, index) => {
@@ -119,18 +125,67 @@ const handleMidiMessage = (event) => {
   }
 };
 
+const handleKeyDown = (event) => {
+  if (event.key === "r" || event.key === "R") {
+    startRandomGenerator();
+  }
+};
+
+const handleKeyUp = (event) => {
+  if (event.key === "r" || event.key === "R") {
+    stopRandomGenerator();
+  }
+};
+
+const startRandomGenerator = () => {
+  if (randomGeneratorActive.value) return;
+
+  randomGeneratorActive.value = true;
+  randomIntervalId.value = setInterval(
+    generateRandomSelections,
+    props.randomInterval,
+  );
+};
+
+const stopRandomGenerator = () => {
+  if (!randomGeneratorActive.value) return;
+
+  randomGeneratorActive.value = false;
+  if (randomIntervalId.value) {
+    clearInterval(randomIntervalId.value);
+    randomIntervalId.value = null;
+  }
+};
+
+const generateRandomSelections = () => {
+  const newSegments = [...internalSelectedSegments.value];
+  segmentCounts.value.forEach((segmentCount, layerIndex) => {
+    if (segmentCount > 0) {
+      newSegments[layerIndex] = Math.floor(Math.random() * segmentCount);
+    }
+  });
+
+  internalSelectedSegments.value = newSegments;
+  emitSelectedSegments(newSegments);
+};
+
 // Setup MIDI listener using the utility
 let cleanupMidi = null;
 onMounted(() => {
   if (props.midiEnabled) {
     cleanupMidi = setupMidiListener(handleMidiMessage);
   }
+  window.addEventListener("keydown", handleKeyDown);
+  window.addEventListener("keyup", handleKeyUp);
 });
 
 onUnmounted(() => {
   if (cleanupMidi) {
     cleanupMidi();
   }
+  stopRandomGenerator();
+  window.removeEventListener("keydown", handleKeyDown);
+  window.removeEventListener("keyup", handleKeyUp);
 });
 </script>
 

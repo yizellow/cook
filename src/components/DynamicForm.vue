@@ -24,7 +24,14 @@ import {
   mapMidiToChoice,
 } from "../utils/midiUtils";
 
-const props = defineProps(["parameters", "values"]);
+const props = defineProps({
+  parameters: Array,
+  values: Object,
+  randomInterval: {
+    type: Number,
+    default: 100, // Same as RadialInterface
+  },
+});
 const emit = defineEmits(["update:parameter"]);
 
 const updateParameter = (paramId, value) => {
@@ -35,6 +42,10 @@ const updateParameter = (paramId, value) => {
 const midiEnabled = true;
 const midiDebug = false; // Set to true to enable debug logs
 const midiMappings = ref([]);
+
+// Random Generator Configuration
+const randomGeneratorActive = ref(false);
+const randomIntervalId = ref(null);
 
 // Create MIDI mappings based on parameters
 const updateMidiMappings = () => {
@@ -168,6 +179,10 @@ onMounted(() => {
       console.log("Web MIDI API not available or MIDI disabled");
     }
   }
+  
+  // Setup keyboard listeners for random generator
+  window.addEventListener('keydown', handleKeyDown);
+  window.addEventListener('keyup', handleKeyUp);
 });
 
 onUnmounted(() => {
@@ -180,7 +195,86 @@ onUnmounted(() => {
       console.log("MIDI cleanup completed");
     }
   }
+  
+  // Cleanup random generator
+  stopRandomGenerator();
+  window.removeEventListener('keydown', handleKeyDown);
+  window.removeEventListener('keyup', handleKeyUp);
 });
+
+// Random Generator Keyboard Handlers
+const handleKeyDown = (event) => {
+  if (event.key === 'r' || event.key === 'R') {
+    startRandomGenerator();
+  }
+};
+
+const handleKeyUp = (event) => {
+  if (event.key === 'r' || event.key === 'R') {
+    stopRandomGenerator();
+  }
+};
+
+const startRandomGenerator = () => {
+  if (randomGeneratorActive.value) return;
+
+  randomGeneratorActive.value = true;
+  randomIntervalId.value = setInterval(generateRandomValues, props.randomInterval);
+};
+
+const stopRandomGenerator = () => {
+  if (!randomGeneratorActive.value) return;
+
+  randomGeneratorActive.value = false;
+  if (randomIntervalId.value) {
+    clearInterval(randomIntervalId.value);
+    randomIntervalId.value = null;
+  }
+};
+
+const generateRandomValues = () => {
+  props.parameters.forEach(param => {
+    let newValue;
+    
+    switch (param.type) {
+      case 'percentage':
+        newValue = Math.floor(Math.random() * 101); // 0-100
+        break;
+      case 'range':
+        const range = param.max - param.min;
+        const randomValue = Math.floor(Math.random() * (range + 1));
+        // Apply step increment if specified
+        if (param.step && param.step > 1) {
+          newValue = param.min + Math.round(randomValue / param.step) * param.step;
+        } else {
+          newValue = param.min + randomValue;
+        }
+        break;
+      case 'spectrum':
+        newValue = Math.floor(Math.random() * 101); // 0-100 like percentage
+        break;
+      case 'boolean':
+        newValue = Math.random() > 0.5; // true/false
+        break;
+      case 'single-choice':
+        if (param.options && param.options.length > 0) {
+          const randomIndex = Math.floor(Math.random() * param.options.length);
+          newValue = param.options[randomIndex];
+        }
+        break;
+      case 'text':
+        // Skip text fields as requested
+        return;
+      default:
+        return;
+    }
+    
+    // Only update if we have a valid new value
+    if (newValue !== undefined) {
+      updateParameter(param.id, newValue);
+    }
+  });
+};
 </script>
 
 <style scoped>
